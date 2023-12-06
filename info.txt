@@ -1,0 +1,13 @@
+https://www.youtube.com/watch?v=MjkamZQJY_8&ab_channel=JohnWeeksDev
+https://www.youtube.com/watch?v=xetBK8xyE1g&list=PLGg3vnFos8GN3MAvxbI-QXKSkBKi2yIFO&index=2&ab_channel=Clovon
+
+
+laravel new instagram-clone
+composer require laravel/breeze
+php artisan breeze:install vue --ssr
+npm install
+npm run dev
+
+npm install admin-lte@^3.2 --save
+
+? npm install vue-material-design-icons vue3-carousel
