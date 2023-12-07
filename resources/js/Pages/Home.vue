@@ -8,6 +8,8 @@
     <MainLayout>
         
         <div class="content-header">
+
+            <!-- CONTENT HEADER -->
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
@@ -23,6 +25,7 @@
             </div>
         </div>
 
+        <!-- CONTENT -->
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
