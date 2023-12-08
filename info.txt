@@ -1,6 +1,11 @@
 https://www.youtube.com/watch?v=MjkamZQJY_8&ab_channel=JohnWeeksDev
 https://www.youtube.com/watch?v=xetBK8xyE1g&list=PLGg3vnFos8GN3MAvxbI-QXKSkBKi2yIFO&index=2&ab_channel=Clovon
 
+=====================
+= ÉRDEMER MEGNÉZNI
+=====================
+https://laravel.hu/cikk/ray-bemutato
+https://spatie.be/docs/ray/v1/introduction
 
 laravel new instagram-clone
 composer require laravel/breeze
