@@ -1,18 +1,31 @@
-<script setup></script>
+<script setup>
+    import { Link } from '@inertiajs/vue3';
+
+</script>
 
 <template>
     <ul class="navbar-nav">
+
+        <!-- HEMBURGER -->
         <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" 
                 href="#" role="button">
                 <i class="fas fa-bars"></i>
             </a>
         </li>
+
+        <!-- HOME -->
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="index3.html" class="nav-link">Home</a>
+            <Link :href="route('dashboard')" 
+                  class="nav-link"
+            >Home</Link>
         </li>
+
+        <!-- CONTACT -->
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link">Contact</a>
+            <Link :href="route('dashboard')" 
+                  class="nav-link"
+            >Contact</Link>
         </li>
     </ul>
 </template>

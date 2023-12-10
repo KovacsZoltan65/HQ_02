@@ -14,5 +14,15 @@ npm install
 npm run dev
 
 npm install admin-lte@^3.2 --save
+npm install sweetalert2
+npm i toastr
 
-? npm install vue-material-design-icons vue3-carousel
+======================
+= VALIDATION
+======================
+npm install vee-validate yup
+
+======================
+= FONTAWESOME
+======================
+https://fontawesome.com/search?q=trash&o=r&m=free&s=solid&f=sharp%2Cclassic
