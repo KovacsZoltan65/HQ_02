@@ -1,39 +1,95 @@
 <script setup>
-    import { reactive, onMounted, onUnmounted } from 'vue';
+    import { ref, onMounted, onUnmounted, watch } from 'vue';
+    import axios from 'axios';
     import { Link } from '@inertiajs/vue3';
     
     import { Form, Field, useResetForm } from 'vee-validate';
     import * as yup from 'yup';
+    import { debounce } from 'lodash';
 
     import MainLayout from '../../../Layouts/MainLayout.vue';
     import { useToastr } from '../../../toastr.js';
-import axios from 'axios';
 
     const toastr = useToastr();
-    const formValues = ref();
-    const editing = ref(false);
     const searchQuery = ref(null);
+    const Users = ref({'data': []});
     const selectedUsers = ref([]);
+    const selectAll = ref(false);
+    const editing = ref(false);
+    const formValues = ref();
+    const form = ref(null);
 
-    const state = reactive({
-        Users: [],
-        
-        // Oldaltörés
-        pagination: {
-            current_page: 1,
-            total_number_of_pages: 0,
-            per_page: 10,
-            range: 5,
-        },
-        // Szűrés és keresés
-        filters: {
-            tags: [],
-            search: null,
-            column: null,
-            direction: null,
-        },
-    });
+    // =================
+    // Adatok lekérése
+    // =================
+    const getUsers = (page = 1) => {
+        axios.get(`/getUsers?page=${page}`, {
+            params: {
+                query: searchQuery.value
+            }
+        })
+        .then((res) => {
+            Users.value = res.data.users;
+            selectedUsers.value = [];
+            selectAll.value = false;
+        });
+    };
 
+    // ====================
+    // Új elem
+    // ====================
+    const addUser = () => {
+        editing.value = false;
+    };
+    const createUser = (values, {resetForm, setErrors}) => {
+        axios.post()
+        .then((response) => {
+            Users.value.data.unshift(response.data);
+            resetForm();
+            toastr.success('User created successfully');
+        })
+        .catch((error) => {
+            if(error.response.data.errors){
+                setErrors(error.response.data.errors);
+            }
+        });
+    }
+
+    // ========================
+    // Szerkesztés
+    // ========================
+    const editUser = (user) => {
+        editing.value = true;
+        form.value.resetForm();
+        formValues.value = {
+            id: user.id,
+            name: user.name,
+            email: user.email
+        };
+    };
+    const updateUser = (values, {setErrors}) => {
+        axios.put()
+        .then((response) => {
+            const index = users.value.data.findIndex(user => user.id === response.data.id);
+            Users.value.data[index] = response.data;
+            toastr.success('User updated successfully');
+        })
+        .catch((error) => {
+            setErrors(error.response.data.errors);
+        });
+    };
+
+    const handleSubmit = (values, actions) => {
+        if(editing.value){
+            updateUser(values, actions);
+        }else{
+            createUser(values, actions);
+        }
+    };
+
+    // =================
+    // Validálás
+    // =================
     const createUserSchema = yup.object({
         name: yup.string().required(),
         email: yup.string().required(),
@@ -48,49 +104,12 @@ import axios from 'axios';
         }),
     });
 
-    const toggleSelection = (user) => {
-        const index = selectedUsers.value.indexOf(user.id);
-        if( index === -1 ){
-            //
-        } else {
-            //
-        }
-    };
-
-    const createUser = async (values, {resetForm, setErrors}) => {
-        axios.post('', values)
-        .then((response) => {
-            users.value.data.unshift(response.data);
-            resetForm();
-            toastr.success('USER CREATED SUCCESSFULLY');
-        })
-        .catch((error) => {
-            if(error.response.data.errors){
-                setErrors(error.response.data.errors);
-            }
-        });
-    };
-
-    const addUser = () => {};
-
-    const editUser = async (user) => {
-        //
-    };
-
-    // Adatok lekérése
-    const getUsers = async (page = 1) => {
-        axios.get(`/getUsers?page=${page}`, {
-            params: {
-                query: searchQuery.value
-            },
-            config: {
-                per_page: 0
-            }
-        })
-        .then((res) => {
-            state.Users = res.data.users;
-        });
-    };
+    // =================
+    // Figyelés
+    // =================
+    watch(searchQuery, debounce(() => {
+        getUsers();
+    }, 300));
 
     onMounted( async () => {
         getUsers();
@@ -149,7 +168,7 @@ import axios from 'axios';
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="user in state.Users">
+                                            <tr v-for="user in Users">
                                                 <td>{{ user.id }}</td>
                                                 <td>{{ user.name }}</td>
                                                 <td>{{ user.email }}</td>

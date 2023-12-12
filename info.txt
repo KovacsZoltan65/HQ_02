@@ -15,7 +15,8 @@ npm run dev
 
 npm install admin-lte@^3.2 --save
 npm install sweetalert2
-npm i toastr
+npm install toastr
+npm install lodash
 
 ======================
 = VALIDATION
