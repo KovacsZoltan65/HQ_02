@@ -17,13 +17,29 @@ npm install admin-lte@^3.2 --save
 npm install sweetalert2
 npm install toastr
 npm install lodash
+npm install moment
+npm install laravel-vue-pagination
 
 ======================
 = VALIDATION
 ======================
-npm install vee-validate yup
+npm install vee-validate --save
+npm install -S yup
 
 ======================
 = FONTAWESOME
 ======================
 https://fontawesome.com/search?q=trash&o=r&m=free&s=solid&f=sharp%2Cclassic
+
+======================
+= HIBAJAVÍTÁS
+======================
+https://stackoverflow.com/questions/72083968/replace-color-adjust-to-print-color-adjust-the-color-adjust-shorthand-is-curren
+https://stackoverflow.com/questions/72511039/autoprefixer-replace-color-adjust-to-print-color-adjust-the-color-adjust-short
+Hiba:
+Replace color-adjust to print-color-adjust. The color-adjust shorthand is currently deprecated [duplicate]
+Megoldás:
+package.json:
+    "overrides": {
+        "autoprefixer": "10.4.5"
+    },

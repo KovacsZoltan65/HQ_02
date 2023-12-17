@@ -25,11 +25,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/getUsers', [App\Http\Controllers\Admin\UsersController::class, 'getUsers'])->name('getUsers');
-Route::resource('/users', App\Http\Controllers\Admin\UsersController::class )->names(
-    [
+Route::get(
+    '/getUsers', 
+    [App\Http\Controllers\Admin\UsersController::class, 'getUsers']
+)->name('getUsers');
+
+Route::resource('/users', App\Http\Controllers\Admin\UsersController::class 
+)->names([
         'users.index' => 'index',
-    ]
-);
+    ]);
 
 require __DIR__.'/auth.php';
