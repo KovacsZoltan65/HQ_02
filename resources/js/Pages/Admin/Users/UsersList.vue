@@ -1,7 +1,7 @@
 <script setup>
     import { ref, onMounted, onUnmounted, watch } from 'vue';
     import axios from 'axios';
-    import { Link } from '@inertiajs/vue3';
+    import { Head, Link } from '@inertiajs/vue3';
     
     import { Form, Field, useResetForm } from 'vee-validate';
     import * as yup from 'yup';
@@ -12,7 +12,7 @@
 
     const toastr = useToastr();
     const searchQuery = ref(null);
-    const Users = ref({'data': []});
+    const Users = ref([]);
     const selectedUsers = ref([]);
     const selectAll = ref(false);
     const editing = ref(false);
@@ -30,7 +30,7 @@
             }
         })
         .then((res) => {
-            Users.value = res.data.users;
+            Users.value = res.data.data;
             selectedUsers.value = [];
             selectAll.value = false;
         });
@@ -141,7 +141,7 @@
         password: yup.string().required(),
     });
 
-    const updateUserSchema = yup.object({
+    const editUserSchema = yup.object({
         name: yup.string().required(),
         email: yup.string().required(),
         password: yup.string().when((password, schema) => {
@@ -265,7 +265,11 @@
         </div>
 
         <!-- userFormModal -->
-        <div class="modal fade" id="userFormModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal fade" id="userFormModal" 
+             data-backdrop="static" 
+             tabindex="-1" role="dialog" 
+             aria-labelledby="staticBackdropLabel" 
+             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     
