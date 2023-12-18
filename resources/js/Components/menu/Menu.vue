@@ -31,7 +31,7 @@
             </li>
         -->
             <li class="nav-item">
-                <Link :href="route('users.index')" 
+                <Link :href="route('users')" 
                       class="nav-link">
                     <i class="nav-icon fas fa-users"></i>
                     <p>

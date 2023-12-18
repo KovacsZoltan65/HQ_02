@@ -32,7 +32,13 @@ Route::get(
 
 Route::resource('/users', App\Http\Controllers\Admin\UsersController::class 
 )->names([
-        'users.index' => 'index',
-    ]);
+      'index' => 'users',
+     'create' => 'users_create',
+      'store' => 'users_store',
+       'edit' => 'users_edit',
+     'update' => 'users_update',
+    'destroy' => 'users_destroy',
+    'restore' => 'users_restore',
+]);
 
 require __DIR__.'/auth.php';

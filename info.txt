@@ -10,6 +10,10 @@ https://spatie.be/docs/ray/v1/introduction
 laravel new instagram-clone
 composer require laravel/breeze
 php artisan breeze:install vue --ssr
+
+composer require prettus/l5-repository
+
+
 npm install
 npm run dev
 
