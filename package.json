@@ -19,6 +19,7 @@
         "vue": "^3.2.41"
     },
     "dependencies": {
+        "@hennge/vue3-pagination": "^1.0.17",
         "admin-lte": "3.2",
         "jquery": "^3.7.1",
         "laravel-vue-pagination": "^4.1.3",

@@ -26,7 +26,7 @@ class UpdateUserRequest extends FormRequest
             'name' => 'required',
             'email' => 'required|email',
             //'language' => 'required',
-            'password' => 'required',
+            'password' => 'required|min:8',
             //'confirm_password' => 'required',
         ];
     }

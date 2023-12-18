@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
-use Illuminate\Foundation\Auth\User as User2;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
@@ -19,6 +19,7 @@ class UsersController extends Controller
     {
         $this->repository = $repository;
     }
+    
     public function index()
     {
         
@@ -29,7 +30,8 @@ class UsersController extends Controller
         
     }
     
-    public function store(StoreUserRequest $request){
+    public function store(StoreUserRequest $request)
+    {
         $user = $this->repository->create($request->all());
         
         return redirect()->back()->with('message', 'USER CREATED');
@@ -40,7 +42,7 @@ class UsersController extends Controller
         //
     }
     
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
         $user = $this->repository->update($request->all(), $id);
         
@@ -62,11 +64,52 @@ class UsersController extends Controller
     }
     
     public function getUsers(Request $request) {
-        
-        $users = User2::query()->paginate(config('app.pagination_limit'));
+        //
+        $config = $request->get('config', []);
+        \Log::info(print_r($config, true));
+        $filters = $request->get('filter', []);
+        \Log::info(print_r($filters, true));
+        if( count($filters) > 0 ){
+            //
+            if( isset($filters['search']) ){
+                //
+                $value = $filters['search'];
+                //
+                $this->repository->findWhere([
+                    ['name', 'like', "%$value%"], 
+                    ['email', 'like', "%$value%"]
+                ]);
+            }
+
+            //
+            $column = 'name';
+            //
+            if( isset($filters['column']) ){
+                //
+                $column = $filters['column'];
+            }
+            //
+            $direction = 'asc';
+            //
+            if( isset($filters['direction']) ){
+                // azt állítom be
+                $direction = $filters['direction'];
+            }
+            //
+            $this->repository->orderBy($column, $direction);
+        }
+        //
+        $per_page = count($config) != 0 && isset($config['per_page']) 
+            ? $config['per_page'] 
+            : config('app.per_page');
+
+
+        $users = User::query()->paginate($per_page);
 
         $data = [
             'users' => $users,
+            'config' => $config,
+            'filters' => $filters,
         ];
 
         return response()->json($data, Response::HTTP_OK);
@@ -81,7 +124,7 @@ class UsersController extends Controller
     }
     
     public function bulkDelete(){
-        User2::whereIn('id', request('ids'))->delete();
+        User::whereIn('id', request('ids'))->delete();
 
         return response()->json(['message' => 'Users deleted successfully!']);
     }
