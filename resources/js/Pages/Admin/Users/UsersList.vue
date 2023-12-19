@@ -3,7 +3,7 @@
     import axios from 'axios';
     import MainLayout from '@/Layouts/MainLayout.vue';
     import { Head, Link } from '@inertiajs/vue3';
-    
+
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
 
@@ -11,20 +11,34 @@
         can: {
             type: Object, default: () => ({}),
         },
+        languageOptions: {
+            type: Object, default: () => ({}),
+        }
     });
 
     const errors = ref({})
 
     const state = reactive({
+        // Felhasználók
         Users: [],
+        // Aktuális felhasználó
         User: newUser(),
-        editingUser: null,
-        deletingUser: null,
+        // Szerkesztendő felhasználó
+        editingUser: newUser(),
+        // Törlendő felhasználó
+        deletingUser: newUser(),
+        changePassword: {
+            password: '',
+            confirm_password: '',
+        },
         showSettingsModal: false,
         showEditModal: false,
         showDeleteModal: false,
-        isEdit: false,
+        showChangePasswordModal: false,
 
+        // Szerkesztés folyamatban
+        isEdit: false,
+        // Táblázat oszlopai
         columns: {
                id: { label: '#', is_visible: true, is_sortable: true, is_filterable: true },
              name: { label: 'name', is_visible: true, is_sortable: true, is_filterable: true },
@@ -47,11 +61,13 @@
         searchQuery: '',
     });
 
+    // =====================
+    // ÚJ REKORD
+    // =====================
+
     // Új rekord előkészítése
     function newUser_init(){
-        state.User = newUser();
-        state.editingUser = null;
-        state.isEdit = false;
+        cancelEdit();
 
         openEditModal();
     };
@@ -59,10 +75,9 @@
     // Új rekord beállítása
     function newUser(){
         return {
-            id: null,
-            name: null,
-            email: null,
-            password: null,
+            id: null, name: null,
+            email: null, password: null,
+            role: null, avatar: null, language: 'hu'
         };
     };
 
@@ -82,10 +97,14 @@
         });
     }
 
+    // =====================
+    // SZERKESZTÉS
+    // =====================
+
     // Szerkesztés kezdete
     function editUser(user){
-        state.editUser = user;
-        state.User = state.editUser;
+        state.editingUser = JSON.parse( JSON.stringify(user) );
+        state.User = state.editingUser;
         state.isEdit = true;
 
         openEditModal();
@@ -94,7 +113,14 @@
     // Szerkesztett adatok mentése
     function updateUser(){
         errors.value = '';
-        axios.put(route('users_update', {user: state.editUser.id}))
+
+        console.log('updateUser');
+        console.log(state.editingUser);
+
+        axios.put(route('users_update', {user: state.editingUser.id}), {
+            name: state.editingUser.name,
+            email: state.editingUser.email,
+        })
         .then(res => {
             closeEditModal();
         })
@@ -106,30 +132,103 @@
         });
     }
 
+    // Szerkesztés megszakítása
+    function cancelEdit(){
+        state.editingUser = newUser();
+        state.User = newUser();
+        state.isEdit = false;
+        errors.value = {};
+    }
+
+    // =====================
+    // JELSZÓ MÓDOSÍTÁS
+    // =====================
+    function changePassword_init(user){
+        state.editingUser = JSON.parse( JSON.stringify(user) );
+        openChangePasswordModal();
+    };
+
+    function changePassword(){
+        errors.value = '';
+
+        axios.post(route('change_password', {user: state.editingUser.id}), {
+            password: state.changePassword.password,
+            change_password: state.changePassword.confirm_password,
+        })
+        .then(res => {
+            closeChangePasswordModal();
+        })
+        .catch(error => {
+            //
+        });
+    }
+
+    function cancelChangePassword(){
+        closeChangePasswordModal();
+    }
+
+    // =====================
+    // TÖRLÉS
+    // =====================
+    function deleteUser_init(user){
+        state.editingUser = null;
+        state.deletingUser = user;
+
+        openDeleteModal();
+    }
+
+    function deleteUser(user){
+        axios.delete(route('users_delete', {user: state.deletingUser.id}))
+        .then(response => {
+            state.Users = state.Users.filter(u => u.id != user.id);
+            state.deleteingUser = null;
+
+            closeDeleteModal();
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }
+
+    // =====================
+    // MODAL KEZELÉS
+    // =====================
+    // beállítások
     function openSettingsModal() {
         $('#settingsModal').modal('show');
     };
     function closeSettingsModal() {
         $('#settingsModal').modal('hide');
     };
-
+    // szerkesztés
     function openEditModal() {
         $('#userFormModal').modal('show');
     };
     function closeEditModal() {
-        state.isEdit = false;
-        errors.value = {};
+        cancelEdit();
 
         $('#userFormModal').modal('hide');
     };
-
+    // törlés
     function openDeleteModal() {
         $('#userDeleteModal').modal('show');
     };
     function closeDeleteModal() {
         $('#userDeleteModal').modal('hide');
     };
+    // jelszó módosítás
+    function openChangePasswordModal(){
+        $('#changePasswordModal').modal('show');
+    };
+    function closeChangePasswordModal(){
+        state.editingUser = newUser();
 
+        $('#changePasswordModal').modal('hide');
+    };
+
+    // =====================
+    // ADATLEKÉRÉS
+    // =====================
     const getUsers = (page = state.pagination.current_page) => {
         axios.get(route('getUsers', {
             filters: state.filter,
@@ -139,7 +238,7 @@
             page
         }))
         .then((response) => {
-            console.log(response);
+            //console.log(response);
             state.Users = response.data.users.data;
 
             state.pagination.total_number_of_pages = response.data.users.last_page;
@@ -232,6 +331,7 @@
                                             <th>#</th>
                                             <th>NAME</th>
                                             <th>EMAIL</th>
+                                            <th>LANGUAGE</th>
                                             <th>OPTIONS</th>
                                         </tr>
                                     </thead>
@@ -240,14 +340,26 @@
                                             <td>{{ user.id }}</td>
                                             <td>{{ user.name }}</td>
                                             <td>{{ user.email }}</td>
+                                            <td>{{ user.language }}</td>
                                             <td>
-                                                <button class="btn btn-primary" type="button"  
+                                                <!-- EDIT -->
+                                                <button class="btn btn-primary" 
+                                                        type="button"  
                                                         @click="editUser(user)">
                                                     <i class="fa fa-edit"></i>
                                                 </button>
-                                                <button class="ml-2 btn btn-danger" type="button">
+                                                <!-- CHANGE PASSWORD -->
+                                                <button class="ml-2 btn btn-warning" 
+                                                        type="button" 
+                                                        @click="changePassword_init(user)">
+                                                    <i class="fa fa-key"></i>
+                                                </button>
+                                                <!-- DELETE -->
+                                                <button class="ml-2 btn btn-danger" 
+                                                        type="button">
                                                     <i class="fa fa-trash"></i>
                                                 </button>
+                                                
                                             </td>
                                         </tr>
                                     </tbody>
@@ -274,7 +386,7 @@
              tabindex="-1" role="dialog" 
              aria-labelledby="staticBackdropLabel" 
              aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-dialog-scrollable" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">
@@ -289,51 +401,67 @@
                     </div>
                     
                     <div class="modal-body">
+                        <div class="row">
+                            <!-- NAME -->
+                            <div class="col form-group">
+                                <label>NAME</label>
+                                
+                                <input name="name" type="text" 
+                                    class="form-control" 
+                                    :class="errors?.name ? 'is-invalid' : 'is-valid'"
+                                    aria-describedby="nameHelp" 
+                                    placeholder="Enter full name"
+                                    v-model="state.editingUser.name"/>
+                                <div class="invalid-feedback" 
+                                    v-if="errors?.name">{{ errors.name[0] }}</div>
 
-                        <!-- NAME -->
-                        <div class="form-group">
-                            <label>NAME</label>
-                            
-                            <input name="name" type="text" 
-                                   class="form-control" 
-                                   :class="errors?.name ? 'is-invalid' : 'is-valid'"
-                                   aria-describedby="nameHelp" 
-                                   placeholder="Enter full name"
-                                   v-model="state.User.name"/>
-                            <div class="invalid-feedback" 
-                                 v-if="errors?.name">{{ errors.name[0] }}</div>
+                            </div>
 
+                            <!-- EMAIL -->
+                            <div class="col form-group">
+                                <label>EMAIL</label>
+                                
+                                <input name="email" type="email" 
+                                    class="form-control"
+                                    :class="errors?.email ? 'is-invalid' : 'is-valid'"
+                                    aria-describedby="emailHelp" 
+                                    placeholder="Enter email"
+                                    v-model="state.editingUser.email"/>
+                                <span class="invalid-feedback" 
+                                    v-if="errors?.email">{{ errors.email[0] }}</span>
+
+                            </div>
                         </div>
+                        <div class="row">
+                            <!-- PASSWORD -->
+                            <div class="col form-group">
+                                <label>PASSWORD</label>
+                                
+                                <input name="password" type="password" 
+                                    class="form-control"
+                                    :class="errors?.password ? 'is-invalid' : 'is-valid'"
+                                    aria-describedby="passwordHelp" 
+                                    placeholder="Enter password"
+                                    v-model="state.editingUser.password"/>
+                                <span class="invalid-feedback" 
+                                    v-if="errors?.password">{{ errors.password[0] }}</span>
 
-                        <!-- EMAIL -->
-                        <div class="form-group">
-                            <label>EMAIL</label>
+                            </div>
+
+                            <!-- LANGUAGE -->
+                            <div class="col form-group">
+                                <label>LANGUAGE</label>
+                                <select class="form-control" 
+                                        aria-label="Default select example">
+                                    <option v-for="(lang, key) in languageOptions" 
+                                            :key="key"
+                                            :value="lang.value"
+                                            :selected="(state.editingUser.language == lang.value)"
+                                    >{{ lang.name }}</option>
+                                </select>
+                            </div>
                             
-                            <input name="email" type="email" 
-                                   class="form-control"
-                                   :class="errors?.email ? 'is-invalid' : 'is-valid'"
-                                   aria-describedby="emailHelp" 
-                                   placeholder="Enter email"
-                                   v-model="state.User.email"/>
-                            <span class="invalid-feedback" 
-                                  v-if="errors?.email">{{ errors.email[0] }}</span>
-
                         </div>
-
-                        <!-- PASSWORD -->
-                        <div class="form-group">
-                            <label>PASSWORD</label>
-                            
-                            <input name="password" type="password" 
-                                   class="form-control" 
-                                   :class="errors?.password ? 'is-invalid' : 'is-valid'"
-                                   aria-describedby="passwordHelp" 
-                                   v-model="state.User.password"/>
-                            <span class="invalid-feedback" 
-                                  v-if="errors?.password">{{ errors.password[0] }}</span>
-
-                        </div>
-
                     </div>
 
                     <div class="modal-footer">
@@ -347,6 +475,70 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- CHANGE PASSWORD MODAL -->
+        <div class="modal fade" id="changePasswordModal" 
+             data-backdrop="static" 
+             tabindex="-1" role="dialog" 
+             aria-labelledby="staticBackdropLabel" 
+             aria-hidden="true">
+             <div class="modal-dialog" role="document">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">
+                            <span>CHANGE PASSWORD</span>
+                        </h5>
+                        <button type="button" class="close" 
+                                data-dismiss="modal" 
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+
+                        <!-- PASSWORD -->
+                        <div class="form-group">
+                            <label>PASSWORD</label>
+                            
+                            <input name="password" type="password" 
+                                class="form-control" 
+                                :class="errors?.password ? 'is-invalid' : 'is-valid'"
+                                aria-describedby="passwordHelp" 
+                                v-model="state.changePassword.password"/>
+                            <span class="invalid-feedback" 
+                                v-if="errors?.password">{{ errors.password[0] }}</span>
+
+                        </div>
+
+                        <!-- CONFIRM PASSWORD -->
+                        <div class="form-group">
+                            <label>CONFIRM PASSWORD</label>
+                            
+                            <input name="confirm_password" type="password" 
+                                class="form-control" 
+                                :class="errors?.confirm_password ? 'is-invalid' : 'is-valid'"
+                                aria-describedby="passwordHelp" 
+                                v-model="state.changePassword.confirm_password"/>
+                            <span class="invalid-feedback" 
+                                v-if="errors?.confirm_password">{{ errors.confirm_password[0] }}</span>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" 
+                                class="btn btn-secondary" 
+                                @click="cancelChangePassword()">CANCEL</button>
+                        <button type="submit" 
+                                class="btn btn-primary"
+                                @click="changePassword()">CHANGE PASSWORD</button>
+                    </div>
+                    
+                </div>
+             </div>
         </div>
 
         <!-- DELETE MODAL -->

@@ -12,11 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->id()->comment('Rekord azonosító');
+            $table->string('name')->comment('Felhasználó neve');
+            $table->string('email')->unique()->comment('Email cím');
+            $table->timestamp('email_verified_at')->nullable()->comment('Email ellenőrzés dátuma');
+            $table->string('password')->comment('Jelszó');
+            $table->string('language', 2)->default('hu')->comment('Felhasználó nyelve');
             $table->rememberToken();
             $table->timestamps();
         });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Interfaces\UserRepositoryInterface;
@@ -22,8 +23,11 @@ class UsersController extends Controller
     
     public function index()
     {
+        //\Log::info( print_r(\App\Enums\Languages::options(), true) );
         
-        return Inertia::render('Admin/Users/UsersList');
+        return Inertia::render('Admin/Users/UsersList', [
+            'languageOptions' => \App\Enums\Languages::options(),
+        ]);
     }
     
     public function create(Request $request){
@@ -49,6 +53,11 @@ class UsersController extends Controller
         return response()->json($user, Response::HTTP_OK);
     }
     
+    public function chengePassword(ChangePasswordRequest $request, $id){
+        \Log::info('id: ' . print_r($id, true));
+        \Log::info('request all: ' . print_r($request->all(), true));
+    }
+    
     public function destory(User $user) {
         $this->repository->delete($id);
         
@@ -63,12 +72,13 @@ class UsersController extends Controller
         return redirect()->back()->with('message', 'USER RESTORE');
     }
     
-    public function getUsers(Request $request) {
+    public function getUsers(Request $request)
+    {
         //
         $config = $request->get('config', []);
-        \Log::info(print_r($config, true));
+        //
         $filters = $request->get('filter', []);
-        \Log::info(print_r($filters, true));
+        //
         if( count($filters) > 0 ){
             //
             if( isset($filters['search']) ){

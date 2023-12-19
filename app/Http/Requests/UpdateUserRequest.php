@@ -24,10 +24,7 @@ class UpdateUserRequest extends FormRequest
         // TODO: Megcsinálni
         return [
             'name' => 'required',
-            'email' => 'required|email',
-            //'language' => 'required',
-            'password' => 'required|min:8',
-            //'confirm_password' => 'required',
+            'email' => 'required|email|unique:users,email,' . $this->user,
         ];
     }
 }

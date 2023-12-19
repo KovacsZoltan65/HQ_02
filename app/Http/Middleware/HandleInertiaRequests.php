@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tightenco\Ziggy\Ziggy;
+use App\Enums\Languages;
 
 class HandleInertiaRequests extends Middleware
 {

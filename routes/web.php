@@ -25,10 +25,19 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// ===============================
+// USERS
+// ===============================
+// felhasználók lekérése
 Route::get(
     '/getUsers', 
     [App\Http\Controllers\Admin\UsersController::class, 'getUsers']
 )->name('getUsers');
+// jelszó módosítás
+Route::post(
+    '/change_password/{user}', 
+    [App\Http\Controllers\Admin\UsersController::class, 'chengePassword']
+)->name('change_password');
 
 Route::resource('/users', App\Http\Controllers\Admin\UsersController::class 
 )->names([
