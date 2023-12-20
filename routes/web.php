@@ -16,6 +16,8 @@ use Inertia\Inertia;
 |
 */
 
+Route::post('/language', [App\Http\Controllers\LanguageController::class, 'index'])->name('language');
+
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 

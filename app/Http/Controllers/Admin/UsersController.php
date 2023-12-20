@@ -23,8 +23,6 @@ class UsersController extends Controller
     
     public function index()
     {
-        //\Log::info( print_r(\App\Enums\Languages::options(), true) );
-        
         return Inertia::render('Admin/Users/UsersList', [
             'languageOptions' => \App\Enums\Languages::options(),
         ]);

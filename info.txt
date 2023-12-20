@@ -36,6 +36,11 @@ npm install -S yup
 https://fontawesome.com/search?q=trash&o=r&m=free&s=solid&f=sharp%2Cclassic
 
 ======================
+= LOCALIZATION
+======================
+https://lokalise.com/blog/laravel-localization-step-by-step/
+
+======================
 = HIBAJAVÍTÁS
 ======================
 https://stackoverflow.com/questions/72083968/replace-color-adjust-to-print-color-adjust-the-color-adjust-shorthand-is-curren

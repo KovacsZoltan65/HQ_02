@@ -10,6 +10,7 @@
     import SidebarLeft from '../Components/SidebarLeft.vue';
     import QuickMenu from '../Components/QuickMenu.vue';
     import NavLink from '../Components/NavLink.vue';
+    import Language from '../Components/Language.vue';
 
     import AdminLTELogo from '../../../public/dist/img/AdminLTELogo.png';
     
@@ -35,6 +36,9 @@
 
                     <!-- NOTIFICATIONS -->
                     <Notifications />
+
+                    <!-- LANGUAGE -->
+                    <Language />
 
                     <!-- FULL SCREEN -->
                     <FullScreen/>
