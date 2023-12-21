@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Criteria\SubdomainCriteria;
+use App\Criteria\SubdomainCriteriaCriteria;
 use App\Interfaces\SubdomainRepositoryInterface;
 use App\Models\Subdomain;
 
@@ -11,7 +11,7 @@ use App\Models\Subdomain;
  *
  * @package namespace App\Repositories;
  */
-class SubdomainRepository extends BaseRepository implements SubdomainRepository
+class SubdomainRepository extends BaseRepository implements SubdomainRepositoryInterface
 {
     /**
      * Specify Model class name
@@ -30,7 +30,7 @@ class SubdomainRepository extends BaseRepository implements SubdomainRepository
      */
     public function boot()
     {
-        $this->pushCriteria(app(SubdomainCriteria::class));
+        $this->pushCriteria(app(SubdomainCriteriaCriteria::class));
     }
     
 }

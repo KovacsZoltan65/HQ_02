@@ -23,6 +23,7 @@ class UsersController extends Controller
     
     public function index()
     {
+        dd( __('users_created_success') );
         return Inertia::render('Admin/Users/UsersList', [
             'languageOptions' => \App\Enums\Languages::options(),
         ]);

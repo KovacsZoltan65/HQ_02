@@ -21,8 +21,14 @@
     "password_placeholder": "Addja meg a jelszót",
     "confirm_password": "Jelszó megerősítés",
 
+    "login": "Bejelentkezés",
+    "logout": "Kijelentkezés",
+    "page_expired": "Lejárt oldal",
+
     "users": "Felhasználók",
     "users_new": "Új felhasználó",
+    "users_success_created": "A felhasználó sikeresen létrehozva!",
+    "users_error_created": "A felhasználó létrehozása nem sikerült",
 
     "companies": "Cégek"
 }

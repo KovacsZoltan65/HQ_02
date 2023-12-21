@@ -21,8 +21,14 @@
     "password_placeholder": "Enter password",
     "confirm_password": "Confirm Password",
 
+    "login": "Login",
+    "logout": "Logout",
+    "page_expired": "Page Expired",
+
     "users": "Users",
     "users_new": "New User",
+    "users_success_created": "User created successfully!",
+    "users_error_created": "Failed to create user!",
 
     "companies": "Companies"
 }
