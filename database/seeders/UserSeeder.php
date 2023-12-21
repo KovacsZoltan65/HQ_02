@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+//use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -28,7 +28,8 @@ class UserSeeder extends Seeder
         $this->command->getOutput()->progressStart($count);
         
         foreach($arr_users as $user){
-            User::factory()->create($user);
+            \App\Models\User::factory()->create($user);
+            //User::factory()->create($user);
             $this->command->getOutput()->progressAdvance();
         }
         $this->command->getOutput()->progressFinish();

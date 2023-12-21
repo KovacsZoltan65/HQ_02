@@ -11,6 +11,7 @@ laravel new instagram-clone
 composer require laravel/breeze
 php artisan breeze:install vue --ssr
 
+composer require laravel/fortify
 composer require prettus/l5-repository
 
 
@@ -58,3 +59,16 @@ package.json:
     "overrides": {
         "autoprefixer": "10.4.5"
     },
+
+======================
+= SUBDOMAINS
+======================
+php artisan make:model Subdomain
+php artisan make:controller SubdomainController --resource
+php artisan make:request CreateSubdomainRequest
+php artisan make:request UpdateSubdomainRequest
+php artisan make:repository Subdomain
+php artisan make:criteria SubdomainCriteria
+php artisan make:migration CreateSubdomainTable
+php artisan make:seeder SubdomainSeeder
+php artisan make:factory SubdomainFactory
