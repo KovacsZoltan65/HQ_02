@@ -1,0 +1,28 @@
+{
+    "dashboard": "Dashboard",
+    "home": "Home",
+    "startpage": "Starter Page",
+
+    "delete_selected": "Delete Selected",
+
+    "search": "Search...",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+
+    "id": "#",
+    "name": "Name",
+    "name_placeholder": "Enter full name",
+    "email": "Email",
+    "email_placeholder": "Enter email address",
+    "language": "Language",
+    "actions": "Options",
+    "password": "Password",
+    "password_placeholder": "Enter password",
+    "confirm_password": "Confirm Password",
+
+    "users": "Users",
+    "users_new": "New User",
+
+    "companies": "Companies"
+}

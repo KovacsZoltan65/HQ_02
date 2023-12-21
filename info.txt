@@ -36,6 +36,12 @@ npm install -S yup
 https://fontawesome.com/search?q=trash&o=r&m=free&s=solid&f=sharp%2Cclassic
 
 ======================
+= HELPER
+======================
+composer require browner12/helpers
+php artisan make:helper translations
+
+======================
 = LOCALIZATION
 ======================
 https://lokalise.com/blog/laravel-localization-step-by-step/

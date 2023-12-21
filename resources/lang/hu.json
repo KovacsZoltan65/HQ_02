@@ -1,0 +1,28 @@
+{
+    "dashboard": "Műszerfal",
+    "home": "Fő oldal",
+    "startpage": "Induló oldal",
+
+    "delete_selected": "Kijelöltek törlése",
+
+    "search": "Keresés...",
+    "cancel": "Mégsem",
+    "create": "Létrehozás",
+    "update": "Frissítés",
+
+    "id": "#",
+    "name": "Név",
+    "name_placeholder": "Adja meg a teljes nevet",
+    "email": "Email",
+    "email_placeholder": "Addja meg az email címet",
+    "language": "Nyelv",
+    "actions": "Műveletek",
+    "password": "Jelszó",
+    "password_placeholder": "Addja meg a jelszót",
+    "confirm_password": "Jelszó megerősítés",
+
+    "users": "Felhasználók",
+    "users_new": "Új felhasználó",
+
+    "companies": "Cégek"
+}

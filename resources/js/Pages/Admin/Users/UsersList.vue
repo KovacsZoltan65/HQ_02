@@ -266,9 +266,9 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item">
-                            <Link :href="route('dashboard')">HOME</Link>
+                            <Link :href="route('dashboard')">{{ $t('home') }}</Link>
                         </li>
-                        <li class="breadcrumb-item active">USERS</li>
+                        <li class="breadcrumb-item active">{{ $t('users') }}</li>
                     </ol>
                 </div>
             </div>
@@ -286,7 +286,7 @@
                                 class="mb-2 btn btn-primary" 
                                 @click="newUser_init()">
                             <i class="fa fa-plus-circle mr-1"></i>
-                            ADD NEW USER
+                            {{ $t('users_new') }}
                         </button>
 
                         <!-- BULK DELETE -->
@@ -294,7 +294,7 @@
                             <button type="button" @click="" 
                                     class="ml-2 mb-2 btn btn-danger">
                                 <i class="fa fa-trash mr-1"></i>
-                                Delete Selected
+                                {{ $t('delete_selected') }}
                             </button>
                             <span class="ml-2">Selected 10 users</span>
                         </div>
@@ -304,7 +304,7 @@
                             <input type="text"
                                    v-model="state.searchQuery" 
                                    class="form-control" 
-                                   placeholder="Search..." />
+                                   :placeholder="$t('search')" />
                         </div>
 
                     </div>
@@ -315,7 +315,7 @@
                         <div class="card">
                             
                             <div class="card-header">
-                                <h5 class="card-title">USERS</h5>
+                                <h5 class="card-title">{{ $t('users') }}</h5>
                             </div>
 
                             <div class="card-body">
@@ -328,11 +328,11 @@
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>NAME</th>
-                                            <th>EMAIL</th>
-                                            <th>LANGUAGE</th>
-                                            <th>OPTIONS</th>
+                                            <th>{{ $t('id')}}</th>
+                                            <th>{{ $t('name')}}</th>
+                                            <th>{{ $t('email')}}</th>
+                                            <th>{{ $t('language')}}</th>
+                                            <th>{{ $t('actions')}}</th>
                                         </tr>
                                     </thead>
                                     <tbody v-for="user in state.Users">
@@ -404,13 +404,13 @@
                         <div class="row">
                             <!-- NAME -->
                             <div class="col form-group">
-                                <label>NAME</label>
+                                <label>{{ $t('name') }}</label>
                                 
                                 <input name="name" type="text" 
                                     class="form-control" 
                                     :class="errors?.name ? 'is-invalid' : 'is-valid'"
                                     aria-describedby="nameHelp" 
-                                    placeholder="Enter full name"
+                                    :placeholder="$t('name_placeholder')"
                                     v-model="state.editingUser.name"/>
                                 <div class="invalid-feedback" 
                                     v-if="errors?.name">{{ errors.name[0] }}</div>
@@ -419,13 +419,13 @@
 
                             <!-- EMAIL -->
                             <div class="col form-group">
-                                <label>EMAIL</label>
+                                <label>{{ $t('email') }}</label>
                                 
                                 <input name="email" type="email" 
                                     class="form-control"
                                     :class="errors?.email ? 'is-invalid' : 'is-valid'"
                                     aria-describedby="emailHelp" 
-                                    placeholder="Enter email"
+                                    :placeholder="$t('email_placeholder')"
                                     v-model="state.editingUser.email"/>
                                 <span class="invalid-feedback" 
                                     v-if="errors?.email">{{ errors.email[0] }}</span>
@@ -435,13 +435,13 @@
                         <div class="row">
                             <!-- PASSWORD -->
                             <div class="col form-group">
-                                <label>PASSWORD</label>
+                                <label>{{ $t('password') }}</label>
                                 
                                 <input name="password" type="password" 
                                     class="form-control"
                                     :class="errors?.password ? 'is-invalid' : 'is-valid'"
                                     aria-describedby="passwordHelp" 
-                                    placeholder="Enter password"
+                                    :placeholder="$t('password_placeholder')"
                                     v-model="state.editingUser.password"/>
                                 <span class="invalid-feedback" 
                                     v-if="errors?.password">{{ errors.password[0] }}</span>
@@ -450,7 +450,7 @@
 
                             <!-- LANGUAGE -->
                             <div class="col form-group">
-                                <label>LANGUAGE</label>
+                                <label>{{ $t('language') }}</label>
                                 <select class="form-control" 
                                         aria-label="Default select example">
                                     <option v-for="(lang, key) in languageOptions" 
@@ -467,11 +467,11 @@
                     <div class="modal-footer">
                         <button type="button" 
                                 class="btn btn-secondary"
-                                @click="closeEditModal()">CANCEL</button>
+                                @click="closeEditModal()">{{ $t('cancel') }}</button>
                         <button type="submit" 
                                 @click="state.isEdit? updateUser() : createUser()"  
                                 class="btn btn-primary"
-                        >{{ state.isEdit ? 'UPDATE' : 'CREATE' }}</button>
+                        >{{ state.isEdit ? $t('update') : $t('create') }}</button>
                     </div>
                 </div>
             </div>

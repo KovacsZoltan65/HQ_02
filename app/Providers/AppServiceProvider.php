@@ -20,16 +20,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-//        Inertia::share([
-//            // ...
-//            'locale' => function(){
-//                return app()->getLocale();
-//            },
-//            'language' => function(){
-//                return translations(
-//                    resource_path('lang/' . app()->getLocale() . '.json')
-//                );
-//            },
-//        ]);
+        Inertia::share([
+            // ...
+            'locale' => function(){
+                return app()->getLocale();
+            },
+            'languages' => config('app.available_locales'),
+            //'language' => function(){
+            //    return translations(
+            //        resource_path('lang/' . app()->getLocale() . '.json')
+            //    );
+            //},
+        ]);
     }
 }

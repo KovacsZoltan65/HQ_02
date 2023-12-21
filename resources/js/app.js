@@ -20,7 +20,7 @@ createInertiaApp({
         return createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(i18nVue, {
-                resolve: async lang => import(`../../lang/${lang}.json`),
+                resolve: async lang => import(`../lang/${lang}.json`),
             })
             .use(ZiggyVue, Ziggy)
             .mount(el);

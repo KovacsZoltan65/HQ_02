@@ -2,16 +2,19 @@
 
 <template>
     <li class="nav-item">
-        <a class="nav-link" data-widget="navbar-search" 
-           href="#" role="button">
+        <a class="nav-link" 
+           data-widget="navbar-search" 
+           href="#" 
+           role="button">
             <i class="fas fa-search"></i>
         </a>
         <div class="navbar-search-block">
             <form class="form-inline">
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-navbar" 
-                           type="search" placeholder="Search" 
-                           aria-label="Search">
+                           type="search" 
+                           :placeholder="$t('search')" 
+                           :aria-label="$t('search')">
                     <div class="input-group-append">
                         <button class="btn btn-navbar" type="submit">
                             <i class="fas fa-search"></i>
