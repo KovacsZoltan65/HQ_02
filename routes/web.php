@@ -40,6 +40,14 @@ Route::post(
     '/change_password/{user}', 
     [App\Http\Controllers\Admin\UsersController::class, 'chengePassword']
 )->name('change_password');
+// Felhasználó csoportos törlése
+Route::delete(
+    '/users/bulkDelete', 
+    /*[App\Http\Controllers\Admin\UsersController::class, 'bulkDelete']*/
+    function(Illuminate\Http\Request $request){
+    dd($request->all());
+    }
+)->name('users.bulkDelete');
 
 Route::resource('/users', App\Http\Controllers\Admin\UsersController::class 
 )->names([

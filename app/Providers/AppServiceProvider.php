@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
             'locale' => function(){
                 return app()->getLocale();
             },
+            // Elérhető nyelvek
             'languages' => config('app.available_locales'),
             //'language' => function(){
             //    return translations(

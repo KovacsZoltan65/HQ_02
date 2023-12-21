@@ -36,14 +36,6 @@
     };
 
     onMounted(() => {
-        console.log('onMounted props: ');
-        console.log(props);
-        console.log('onMounted languages: ');
-        console.log(languages);
-        console.log('onMounted act_locale: ');
-        console.log(act_locale.value);
-        //console.log(user);
-
         // Aktuális nyelv eltárolása
         act_locale.value = props.locale;
         // Nyelv betöltése

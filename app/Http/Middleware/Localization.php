@@ -19,7 +19,6 @@ class Localization
         //    \App::setLocale(Session::get('locale'));
         //}
         if( session()->has('locale') ){
-            \Log::info('session: ' . print_r(session()->get('locale'), true));
             app()->setLocale( session()->get('locale') );
         }
         return $next($request);

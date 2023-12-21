@@ -6,6 +6,9 @@
 
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
+    import { useToastr } from '../../../toastr.js';
+
+    const toastr = useToastr();
 
     const props = defineProps({
         can: {
@@ -16,7 +19,9 @@
         }
     });
 
-    const errors = ref({})
+    const errors = ref({});
+    const selectedUsers = ref([]);
+    const selectAll = ref(false);
 
     const state = reactive({
         // Felhasználók
@@ -190,6 +195,37 @@
         });
     }
 
+    const bulkDelete = () => {
+        axios.delete(route('users.bulkDelete', {data:{ids: selectedUsers.value}})
+        ).then(response => {
+            state.Users.value.data = state.Users.value.data.filter(user => !selectedUsers.value.includes(user.id));
+            selectedUsers.value = [];
+            selectAll.value = false;
+            toastr.success(response.data.message);
+        });
+    }
+
+    // =====================
+    // KIJELÖLÉS
+    // =====================
+    const toggleSelection = (user) => {
+        const index = selectedUsers.value.indexOf(user.id);
+        if( index === -1 ){
+            selectedUsers.value.push(user.id);
+        }else{
+            selectedUsers.value.splice(index, 1);
+        }
+    }
+
+    const selectAllUsers = () => {
+        if(selectAll.value){
+            selectedUsers.value = state.Users.map(user => user.id);
+        }else{
+            selectedUsers.value = [];
+        }
+        console.log(selectedUsers.value);
+    };
+
     // =====================
     // MODAL KEZELÉS
     // =====================
@@ -238,8 +274,10 @@
             page
         }))
         .then((response) => {
-            //console.log(response);
             state.Users = response.data.users.data;
+            // Kijelölések megszüntetése
+            selectedUsers.value = [];
+            selectAll.value = false;
 
             state.pagination.total_number_of_pages = response.data.users.last_page;
             state.pagination.current_page = response.data.users.current_page;
@@ -290,23 +328,15 @@
                         </button>
 
                         <!-- BULK DELETE -->
-                        <div>
-                            <button type="button" @click="" 
+                        <div v-if="selectedUsers.length > 0">
+                            <button type="button" 
+                                    @click="bulkDelete" 
                                     class="ml-2 mb-2 btn btn-danger">
                                 <i class="fa fa-trash mr-1"></i>
                                 {{ $t('delete_selected') }}
                             </button>
-                            <span class="ml-2">Selected 10 users</span>
+                            <span class="ml-2">Selected {{ selectedUsers.length }} users</span>
                         </div>
-
-                        <!-- SEARCH -->
-                        <div>
-                            <input type="text"
-                                   v-model="state.searchQuery" 
-                                   class="form-control" 
-                                   :placeholder="$t('search')" />
-                        </div>
-
                     </div>
                 </div>
 
@@ -316,6 +346,19 @@
                             
                             <div class="card-header">
                                 <h5 class="card-title">{{ $t('users') }}</h5>
+                                <div class="card-tools">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               v-model="state.searchQuery"
+                                               :placeholder="$t('search')" />
+                                        <div class="input-group-append">
+                                            <div class="btn btn-primary">
+                                                <i class="fas fa-search"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="card-body">
@@ -328,6 +371,13 @@
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
+                                            <!-- SELECT ALL -->
+                                            <th>
+                                                <input id="checkbox-all" 
+                                                       type="checkbox" 
+                                                       v-model="selectAll" 
+                                                       @change="selectAllUsers"/>
+                                            </th>
                                             <th>{{ $t('id')}}</th>
                                             <th>{{ $t('name')}}</th>
                                             <th>{{ $t('email')}}</th>
@@ -337,6 +387,12 @@
                                     </thead>
                                     <tbody v-for="user in state.Users">
                                         <tr>
+                                            <!-- SELECT RECORD -->
+                                            <td>
+                                                <input type="checkbox" 
+                                                       :checked="selectAll"
+                                                       @change="toggleSelection(user)"/>
+                                            </td>
                                             <td>{{ user.id }}</td>
                                             <td>{{ user.name }}</td>
                                             <td>{{ user.email }}</td>
