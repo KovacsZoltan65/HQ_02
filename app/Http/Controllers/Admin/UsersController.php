@@ -8,8 +8,10 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
+use App\Notifications\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 
 class UsersController extends Controller
@@ -23,27 +25,27 @@ class UsersController extends Controller
     
     public function index()
     {
-        dd( __('users_created_success') );
-        return Inertia::render('Admin/Users/UsersList', [
-            'languageOptions' => \App\Enums\Languages::options(),
-        ]);
+        //return Inertia::render('Admin/Users/UsersList', ['languageOptions' => \App\Enums\Languages::options(),]);
+        return Inertia::render('Admin/Users/UsersList');
     }
     
-    public function create(Request $request){
-        
-    }
+    public function create(Request $request){}
     
     public function store(StoreUserRequest $request)
     {
         $user = $this->repository->create($request->all());
         
+        Notification::send($user, new UserNotification($request->name));
+        
         return redirect()->back()->with('message', 'USER CREATED');
     }
     
-    public function edit(User $user)
-    {
-        //
-    }
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id){}
+    
+    public function edit(User $user){}
     
     public function update(UpdateUserRequest $request, $id)
     {
@@ -73,10 +75,12 @@ class UsersController extends Controller
     
     public function getUsers(Request $request)
     {
+        //dd($request->get('config', []), $request->get('filters', []));
         //
         $config = $request->get('config', []);
         //
-        $filters = $request->get('filter', []);
+        $filters = $request->get('filters', []);
+        //dd($config, $filters);
         //
         if( count($filters) > 0 ){
             //

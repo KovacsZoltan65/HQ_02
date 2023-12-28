@@ -20,6 +20,8 @@
     "password": "Password",
     "password_placeholder": "Enter password",
     "confirm_password": "Confirm Password",
+    "url": "URL",
+    "url_placeholder": "URL",
 
     "login": "Login",
     "logout": "Logout",
@@ -30,5 +32,15 @@
     "users_success_created": "User created successfully!",
     "users_error_created": "Failed to create user!",
 
-    "companies": "Companies"
+    "companies": "Companies",
+    
+    "subdomains": "Subdomains",
+    "subdomain": "Subdomain",
+    "subdomains_card_text": "List of subdomains",
+    "subdomains_new": "New Subdomain",
+    "subdomains_edit": "Edit Subdomain",
+    "subdomains_created": "The subdomain has been created successfully",
+    "subdomains_deleted": "The subdomain has been successfully deleted!",
+    "subdomains_bulk_deleted": "The group deletion of the subdomain has been successfully completed!",
+    "subdomains_restore": "The subdomain has been restored successfully!"
 }

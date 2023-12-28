@@ -52,6 +52,12 @@ https://lokalise.com/blog/laravel-localization-step-by-step/
 ======================
 https://stackoverflow.com/questions/72083968/replace-color-adjust-to-print-color-adjust-the-color-adjust-shorthand-is-curren
 https://stackoverflow.com/questions/72511039/autoprefixer-replace-color-adjust-to-print-color-adjust-the-color-adjust-short
+
+php artisan make:notification UserNotification
+php artisan notification:table
+
+
+
 Hiba:
 Replace color-adjust to print-color-adjust. The color-adjust shorthand is currently deprecated [duplicate]
 Megoldás:
@@ -59,6 +65,12 @@ package.json:
     "overrides": {
         "autoprefixer": "10.4.5"
     },
+
+======================
+= NOTIFICATIONS
+======================
+https://www.youtube.com/watch?v=XmGT-0gdydQ&ab_channel=TheCodingSolution
+https://www.youtube.com/watch?v=o3pb7f-I6u8&t=594s&ab_channel=ABNationProgrammers
 
 ======================
 = SUBDOMAINS

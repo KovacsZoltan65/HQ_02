@@ -63,7 +63,10 @@ Route::resource('/users', \App\Http\Controllers\Admin\UsersController::class
 // ===============================
 // SUBDOMAINS
 // ===============================
-Route::get('/getSubdomains', [\App\Http\Controllers\SubdomainController::class, 'getSubdomains'])->name('getSubdomains');
+Route::get(
+    '/getSubdomains', 
+    [\App\Http\Controllers\SubdomainController::class, 'getSubdomains']
+)->name('getSubdomains');
 
 Route::delete('/subdomains/{subdomain}/bulkDelete', [\App\Http\Controllers\SubdomainController::class, 'bulkDelete'])->name('subdomains_bulkDelete');
 Route::post('/subdomains/{subdomain}/restore/', [\App\Http\Controllers\SubdomainController::class, 'restore'])->name('subdomains_restore');

@@ -20,6 +20,8 @@
     "password": "Jelszó",
     "password_placeholder": "Addja meg a jelszót",
     "confirm_password": "Jelszó megerősítés",
+    "url": "URL",
+    "url_placeholder": "URL",
 
     "login": "Bejelentkezés",
     "logout": "Kijelentkezés",
@@ -30,5 +32,15 @@
     "users_success_created": "A felhasználó sikeresen létrehozva!",
     "users_error_created": "A felhasználó létrehozása nem sikerült",
 
-    "companies": "Cégek"
+    "companies": "Cégek",
+    
+    "subdomains": "Aldomainek",
+    "subdomain": "Aldomain",
+    "subdomains_card_text": "Aldomain-ek listája",
+    "subdomains_new": "Új aldomain",
+    "subdomains_edit": "Aldomain szerkesztése",
+    "subdomains_created": "Az aldomain sikeresen elkészült",
+    "subdomains_deleted": "Az aldomain törlése sikeresen megtörtént!",
+    "subdomains_bulk_deleted": "Az aldomain csoportos törlése sikeresen megtörtént!",
+    "subdomains_restore": "Az aldomain visszaállítása sikeresen megtörtént!"
 }

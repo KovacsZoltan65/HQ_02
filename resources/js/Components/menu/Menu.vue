@@ -42,12 +42,13 @@
             </li>
 
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <Link :href="route('subdomains')" 
+                   class="nav-link">
                     <i class="nav-icon fas fa-building"></i>
                     <p>
-                        {{ $t('companies') }}
+                        {{ $t('subdomains') }}
                     </p>
-                </a>
+                </Link>
             </li>
 
             <!--<li class="nav-item">

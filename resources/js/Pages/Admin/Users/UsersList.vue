@@ -13,9 +13,6 @@
     const props = defineProps({
         can: {
             type: Object, default: () => ({}),
-        },
-        languageOptions: {
-            type: Object, default: () => ({}),
         }
     });
 
@@ -71,7 +68,7 @@
     // =====================
 
     // Új rekord előkészítése
-    function newUser_init(){
+    function newRecord_init(){
         cancelEdit();
 
         openEditModal();
@@ -296,18 +293,24 @@
     <MainLayout>
         
         <!-- CONTENT HEADER -->
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">{{ $t('users') }}</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item">
-                            <Link :href="route('dashboard')">{{ $t('home') }}</Link>
-                        </li>
-                        <li class="breadcrumb-item active">{{ $t('users') }}</li>
-                    </ol>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+
+                    <!-- PAGE TITLE -->
+                    <div class="col-sm-6">
+                        <h1 class="m-0">{{ $t('users') }}</h1>
+                    </div>
+
+                    <!-- BREADCRUMB -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item">
+                                <Link :href="route('dashboard')">{{ $t('home') }}</Link>
+                            </li>
+                            <li class="breadcrumb-item active">{{ $t('users') }}</li>
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>
@@ -319,10 +322,10 @@
                 <div class="d-flex justify-content-between">
                     <div class="d-flex">
                         
-                        <!-- ADD NEW USER -->
+                        <!-- ADD NEW RECORD -->
                         <button type="button" 
                                 class="mb-2 btn btn-primary" 
-                                @click="newUser_init()">
+                                @click="newRecord_init()">
                             <i class="fa fa-plus-circle mr-1"></i>
                             {{ $t('users_new') }}
                         </button>
@@ -382,7 +385,9 @@
                                             <th>{{ $t('name')}}</th>
                                             <th>{{ $t('email')}}</th>
                                             <th>{{ $t('language')}}</th>
-                                            <th>{{ $t('actions')}}</th>
+                                            <th>
+                                                {{ $t('actions')}}
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody v-for="user in state.Users">
@@ -411,7 +416,7 @@
                                                     <i class="fa fa-key"></i>
                                                 </button>
                                                 <!-- DELETE -->
-                                                <button class="ml-2 btn btn-danger" 
+                                                <button class="btn btn-danger ml-2" 
                                                         type="button">
                                                     <i class="fa fa-trash"></i>
                                                 </button>

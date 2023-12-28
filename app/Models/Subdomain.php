@@ -21,6 +21,16 @@ class Subdomain extends Model
         'access_control_system' => 'int',
                   'last_export' => 'datetime',
     ];
+    
+    protected $attributes = [
+             'db_port' => 3306,
+             'db_host' => 'localhost',
+        'notification' => 1,
+            'state_id' => 1,
+           'is_mirror' => 0,
+                 'sso' => 0,
+        'access_control_system' => 0,
+    ];
 
     protected $fillable = [
 		'subdomain', 'url', 'name',
