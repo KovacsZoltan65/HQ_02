@@ -22,6 +22,23 @@
     "confirm_password": "Confirm Password",
     "url": "URL",
     "url_placeholder": "URL",
+    
+    "db_host": "DB Host",
+    "db_host_placeholder": "db host",
+    "db_port": "DB Port",
+    "db_port_placeholder": "db port",
+    "db_name": "DB Name",
+    "db_name_placeholder": "db name",
+    "db_user": "DB User",
+    "db_user_placeholder": "db user",
+    "db_password": "DB Password",
+    "db_password_placeholder": "db password",
+    
+    "notification": "Notification",
+    "sso": "Single Sign-On",
+    "is_mirror": "Is Mirror",
+    "state_id": "Satate",
+    "access_control_system": "Access Control System",
 
     "login": "Login",
     "logout": "Logout",

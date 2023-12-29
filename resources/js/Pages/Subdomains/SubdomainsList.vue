@@ -52,6 +52,50 @@
                  name: { label: 'name', is_visible: true, is_sortable: true, is_filterable: true },
         },
 
+        subdomain_states: [
+            {
+                id: 1,
+                name: 'Aktív'
+            },
+            {
+                id: 2,
+                name: 'Felfüggesztve'
+            },
+            {
+                id: 3,
+                name: 'Leállítva(HQ)'
+            },
+            {
+                id: 4,
+                name: 'Leállítva(példány)'
+            }
+        ],
+        access_control_systems: [
+            {
+                id: 0,
+                name: 'Nincs'
+            },{
+                id: 1,
+                name: 'WinAccess'
+            },
+            {
+                id: 2,
+                name: 'Enviromux'
+            },
+            {
+                id: 3,
+                name: 'Siport'
+            },
+            {
+                id: 4,
+                name: 'WinAccess WC'
+            },
+            {
+                id: 5,
+                name: 'GenerallyACS'
+            }
+        ],
+
     });
 
     // =====================
@@ -417,7 +461,7 @@
                                 <input name="url" type="text" 
                                     class="form-control" 
                                     :class="errors?.url ? 'is-invalid' : 'is-valid'"
-                                    aria-describedby="urlHelp" 
+                                    aria-describedby="url_help" 
                                     :placeholder="$t('url_placeholder')"
                                     v-model="state.editingRecord.url"/>
                                 <div class="invalid-feedback" 
@@ -425,6 +469,157 @@
 
                             </div>
                         </div>
+
+                        <div class="row">
+                            <!-- DB_HOST -->
+                            <div class="col form-group">
+                                <label>{{ $t('db_host') }}</label>
+                                <input name="db_host" id="db_host" 
+                                       class="form-control" :class="errors?.db_host? 'is-invalid' : 'is-valid'" 
+                                       aria-describedby="db_host_help"  
+                                       :placeholder="$t('db_host_placeholder')"
+                                       v-model="state.editingRecord.db_host" />
+                                <div class="invalid-feedback" 
+                                     v-if="errors?.db_host">{{ errors.db_host[0] }}</div>
+                            </div>
+
+                            <!-- DB_PORT -->
+                            <div class="col form-group">
+                                <label>{{ $t('db_port') }}</label>
+                                <input name="db_port" id="db_port" 
+                                       class="form-control" :class="errors?.db_port? 'is-invalid' : 'is-valid'"
+                                       aria-describedby="db_port_help"   
+                                       :placeholder="$t('db_port_placeholder')"
+                                       v-model="state.editingRecord.db_port" />
+                                <div class="invalid-feedback" 
+                                     v-if="errors?.db_port">{{ errors.db_port[0] }}</div>
+                            </div>
+
+                            <!-- DB_NAME -->
+                            <div class="col form-group">
+                                <label>{{ $t('db_name') }}</label>
+                                <input name="db_name" id="db_name" 
+                                       class="form-control" :class="errors?.db_name? 'is-invalid' : 'is-valid'"
+                                       aria-describedby="db_name_help"    
+                                       :placeholder="$t('db_name_placeholder')"
+                                       v-model="state.editingRecord.db_name" />
+                                <div class="invalid-feedback" 
+                                     v-if="errors?.db_name">{{ errors.db_name[0] }}</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- DB_USER -->
+                            <div class="col form-group">
+                                <label>{{ $t('db_user') }}</label>
+                                <input name="db_user" id="db_user" 
+                                       class="form-control" :class="errors?.db_user? 'is-invalid' : 'is-valid'"
+                                       aria-describedby="db_user_help"     
+                                       :placeholder="$t('db_user_placeholder')"
+                                       v-model="state.editingRecord.db_user" />
+                                <div class="invalid-feedback" 
+                                     v-if="errors?.db_user">{{ errors.db_user[0] }}</div>
+                            </div>
+
+                            <!-- DB_PASSWORD -->
+                            <!--
+                            <div class="col form-group">
+                                <label>{{ $t('db_password') }}</label>
+                                <input name="db_password" id="db_password" 
+                                       class="form-control" :class="errors?.db_password? 'is-invalid' : 'is-valid'" 
+                                       aria-describedby="db_password_help"    
+                                       :placeholder="$t('db_password_placeholder')" 
+                                       v-model="state.editingRecord.db_password" />
+                                <div class="invalid-feedback" 
+                                     v-if="errors?.db_password">{{ errors.db_password[0] }}</div>
+                            </div>
+                            -->
+                            <div class="col form-group">
+                                <label>{{ $t('db_password') }}</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" 
+                                        class="form-control" 
+                                        placeholder="$t('db_password_placeholder')" 
+                                        aria-label="Recipient's username" 
+                                        aria-describedby="password_generate">
+                                    <button class="btn btn-outline-secondary" 
+                                            type="button" 
+                                            id="password_generate">
+                                        <i class="fa fa-fingerprint"></i>
+                                    </button>
+                                    <div class="invalid-feedback" 
+                                         v-if="errors?.db_password">{{ errors.db_password[0] }}</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr/>
+
+                        <div class="row">
+                            <div class="col form-check">
+                                <input id="notification" name="notification"
+                                       class="form-check-input" 
+                                       type="checkbox" 
+                                       value="" 
+                                       v-model="state.editingRecord.notification"/>
+                                <label class="form-check-label" for="notification">
+                                    {{ $t('notification') }}
+                                </label>
+                            </div>
+                            <div class="col form-check">
+                                <input id="is_mirror" name="is_mirror"
+                                       class="form-check-input" 
+                                       type="checkbox" 
+                                       value=""
+                                       v-model="state.editingRecord.is_mirror">
+                                <label class="form-check-label" 
+                                       for="is_mirror">
+                                       {{ $t('is_mirror') }}
+                                </label>
+                            </div>
+                            <div class="col form-check">
+                                <input id="sso" name="sso" 
+                                       class="form-check-input" 
+                                       type="checkbox" 
+                                       value=""
+                                       v-model="state.editingRecord.sso">
+                                <label class="form-check-label" 
+                                       for="sso">
+                                       {{ $t('sso') }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr/>
+
+                        <div class="row">
+                            <!-- STATE_ID -->
+                            <div class="col form-group">
+                                <label>{{ $t('state_id') }}</label>
+                                <select id="state_id" name="state_id"
+                                        class="form-control">
+                                    <option v-for="s in state.subdomain_states" 
+                                            :key="s.id" 
+                                            :value="s.name"
+                                            :selected="(s.id == state.editingRecord.state_id)">{{ s.name }}</option>
+                                </select>
+                            </div>
+
+                            <!-- ACCESS CONTROLL_SYSTEM -->
+                            <div class="col form-group">
+                                <label>{{ $t('access_control_system') }}</label>
+                                <select id="access_control_system" name="access_control_system"
+                                        class="form-control">
+                                    <option v-for="acs in state.access_control_systems"
+                                            :key="acs.id" 
+                                            :value="acs.name"
+                                            :selected="(acs.id == state.editingRecord.access_control_system)"
+                                    >{{ acs.name }}</option>
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" 

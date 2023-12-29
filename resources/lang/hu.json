@@ -22,6 +22,23 @@
     "confirm_password": "Jelszó megerősítés",
     "url": "URL",
     "url_placeholder": "URL",
+    
+    "db_host": "DB kiszolgáló",
+    "db_host_placeholder": "db host",
+    "db_port": "DB port",
+    "db_port_placeholder": "db port",
+    "db_name": "DB név",
+    "db_name_placeholder": "db név",
+    "db_user": "DB felhasználó",
+    "db_user_placeholder": "db felhasználó",
+    "db_password": "DB jelszó",
+    "db_password_placeholder": "db jelszó",
+    
+    "notification": "Értesítés",
+    "sso": "Egyszeri beléptetés",
+    "is_mirror": "Tükör",
+    "state_id": "Állapot",
+    "access_control_system": "Beléptető rendszer",
 
     "login": "Bejelentkezés",
     "logout": "Kijelentkezés",

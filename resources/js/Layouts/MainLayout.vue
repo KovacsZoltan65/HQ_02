@@ -12,7 +12,8 @@
     import NavLink from '../Components/NavLink.vue';
     import Language from '../Components/Language.vue';
 
-    import AdminLTELogo from '../../../public/dist/img/AdminLTELogo.png';
+    //import AdminLTELogo from '../../../public/dist/img/AdminLTELogo.png';
+    import CompanyLogo from '../../../public/dist/img/CompanyLogo.png';
     
 </script>
 
@@ -54,11 +55,11 @@
                 <Link class="brand-link"
                          :href="route('dashboard')" 
                          :active="route().current('/dashboard')">
-                    <img :src="AdminLTELogo" 
-                         alt="AdminLTE Logo" 
+                    <img :src="CompanyLogo" 
+                         alt="Company Logo" 
                          class="brand-image img-circle elevation-3" 
                          style="opacity: .8">
-                    <span class="brand-text font-weight-light">AdminLTE 3</span>
+                    <span class="brand-text font-weight-light">Company Name</span>
                 </Link>
 
                 <!-- LEFT SIDEBAR -->
