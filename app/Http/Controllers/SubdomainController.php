@@ -119,6 +119,23 @@ class SubdomainController extends Controller
         return response()->json($data, Response::HTTP_OK);
     }
     
+    public function getSubdomains2(Request $request){
+        //
+        $config = $request->get('config', []);
+        //
+        $filters = $request->get('filters', []);
+        
+        $subdomains = Subdomain::all();
+        
+        $data = [
+            'subdomains' => $subdomains,
+            'config' => $config,
+            'filters' => $filters,
+        ];
+        
+        return response()->json($data, Response::HTTP_OK);
+    }
+    
     public function bulkDelete(Request $request)
     {
         Subdomain::whereIn('id', $request->get('ids'))->delete();

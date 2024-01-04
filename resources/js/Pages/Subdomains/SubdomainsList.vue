@@ -6,8 +6,12 @@
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
     
+    import SubdomainsGrid from './SubdomainsGrid.vue';
+
     import { useToastr } from '@/toastr';
     const toastr = useToastr();
+
+    const searchQuery = ref('');
 
     const props = defineProps({
         can: {
@@ -161,6 +165,10 @@
         console.log('deleteRecord_init', record);
         state.deletingRecord = record;
     }
+    // Törlés megerősítése
+    const confirmDelete = (id) => {
+        console.log('confirmDelete', id);
+    };
     // Rekord törlése
     const deleteRecord = () => {};
     // Rekordok csoportos törlése
@@ -263,6 +271,7 @@
 
         <!-- CONTENT -->
         <div class="content">
+
             <div class="container-fluid">
                 
                 <div class="d-flex justify-content-between">
@@ -289,6 +298,42 @@
                     </div>
                 </div>
 
+                <!-- ALAP TÁBLÁZAT -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header"></div>
+                            
+                            <div class="card-body"></div>
+
+                            <div class="card-footer"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALAP TÁBLÁZAT -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header"></div>
+                            <div class="card-body">
+                                
+                                <SubdomainsGrid :data="state.Records" 
+                                                :columns="state.columns" 
+                                                :filter-key="searchQuery"
+                                                :select-all="selectAll"
+                                                @edit-record="editRecord"
+                                                @confirmDelete="confirmDelete"
+                                                @toggle-selection="toggleSelection"
+                                ></SubdomainsGrid>
+
+                            </div>
+                            <div class="card-footer"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALAP TÁBLÁZAT -->
                 <div class="row">
                     <div class="col-lg-12">
                         
@@ -366,17 +411,19 @@
                                             <td>{{ record.url }}</td>
                                             <td>{{ record.name }}</td>
                                             <td>
-                                                <!-- EDIT -->
-                                                <button class="btn btn-primary" 
-                                                        type="button" 
-                                                        @click="editRecord(record)">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
+                                                <div class="bd-example">
+                                                    <!-- EDIT -->
+                                                    <button class="btn btn-primary" 
+                                                            type="button" 
+                                                            @click="editRecord(record)">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
 
-                                                <!-- DELETE -->
-                                                <button class="btn btn-danger ml-2">
-                                                     <i class="fa fa-trash"></i>
-                                                </button>
+                                                    <!-- DELETE -->
+                                                    <button class="btn btn-danger">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
