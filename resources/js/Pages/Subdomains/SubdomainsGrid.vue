@@ -50,7 +50,7 @@
                         </button>
 
                         <button class="btn btn-danger"
-                                @click.prevent="$emit('confirmDelete', dat['id'])">
+                                @click.prevent="$emit('confirmDelete', dat)">
                             <i class="fa fa-trash"></i>
                         </button>
                     </div>

@@ -9,6 +9,7 @@
     "cancel": "Cancel",
     "create": "Create",
     "update": "Update",
+    "delete": "Delete",
 
     "id": "#",
     "name": "Name",
@@ -57,6 +58,8 @@
     "subdomains_new": "New Subdomain",
     "subdomains_edit": "Edit Subdomain",
     "subdomains_created": "The subdomain has been created successfully",
+    "subdomains_delete": "Delete Subdomain",
+    "subdomains_delete_confirmation": "Are you sure you want to delete this subdomain ?",
     "subdomains_deleted": "The subdomain has been successfully deleted!",
     "subdomains_bulk_deleted": "The group deletion of the subdomain has been successfully completed!",
     "subdomains_restore": "The subdomain has been restored successfully!"

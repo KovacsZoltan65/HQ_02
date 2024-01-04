@@ -9,6 +9,7 @@
     "cancel": "Mégsem",
     "create": "Létrehozás",
     "update": "Frissítés",
+    "delete": "Törlés",
 
     "id": "#",
     "name": "Név",
@@ -56,6 +57,8 @@
     "subdomains_card_text": "Aldomain-ek listája",
     "subdomains_new": "Új aldomain",
     "subdomains_edit": "Aldomain szerkesztése",
+    "subdomains_delete": "Aldomain törlése",
+    "subdomains_delete_confirmation": "Biztosan törli ezt az aldomaint?",
     "subdomains_created": "Az aldomain sikeresen elkészült",
     "subdomains_deleted": "Az aldomain törlése sikeresen megtörtént!",
     "subdomains_bulk_deleted": "Az aldomain csoportos törlése sikeresen megtörtént!",

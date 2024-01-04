@@ -161,19 +161,39 @@
     // REKORD(OK) TÖRLÉSE
     // =====================
     // Törlés előkészítése
-    const deleteRecord_init = (record) => {
-        console.log('deleteRecord_init', record);
-        state.deletingRecord = record;
-    }
+    //const deleteRecord_init = (record) => {
+    //    console.log('deleteRecord_init', record);
+    //    state.deletingRecord = record;
+    //}
     // Törlés megerősítése
-    const confirmDelete = (id) => {
-        console.log('confirmDelete', id);
+    const confirmDelete = (record) => {
+        console.log('confirmDelete', record);
+        state.deletingRecord = record;
+        console.log('state.deletingRecord', state.deletingRecord);
+
+        $('#deleteModal').modal('show');
     };
     // Rekord törlése
-    const deleteRecord = () => {};
+    const deleteRecord = (record) => {
+        console.log(record);
+        //axios.delete(`/subdomains/${state.deletingRecord.id}`)
+        //.then((response) => {
+            //
+        //})
+        //.catch((error) => {
+            //
+        //});
+        $('#deleteModal').modal('hide');
+    };
+
     // Rekordok csoportos törlése
     const bulkDelete = () => {
         console.log('bulkDelete');
+    };
+
+    const cancelDelete = () => {
+        state.deletingRecord = newRecord();
+        closeDeleteModal();
     };
 
     // =====================
@@ -298,48 +318,11 @@
                     </div>
                 </div>
 
-                <!-- ALAP TÁBLÁZAT -->
+                <!-- TÁBLÁZAT -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
-                            <div class="card-header"></div>
                             
-                            <div class="card-body"></div>
-
-                            <div class="card-footer"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ALAP TÁBLÁZAT -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header"></div>
-                            <div class="card-body">
-                                
-                                <SubdomainsGrid :data="state.Records" 
-                                                :columns="state.columns" 
-                                                :filter-key="searchQuery"
-                                                :select-all="selectAll"
-                                                @edit-record="editRecord"
-                                                @confirmDelete="confirmDelete"
-                                                @toggle-selection="toggleSelection"
-                                ></SubdomainsGrid>
-
-                            </div>
-                            <div class="card-footer"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ALAP TÁBLÁZAT -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        
-                        <div class="card">
-
-                            <!-- CARD HEADER -->
                             <div class="card-header">
                                 <h5 class="card-title">{{ $t('subdomains') }}</h5>
                                 <div class="card-tools">
@@ -357,7 +340,55 @@
                                 </div>
                             </div>
 
-                            <!-- CARD BODY -->
+                            <div class="card-body">
+                                
+                                <SubdomainsGrid :data="state.Records" 
+                                                :columns="state.columns" 
+                                                :filter-key="searchQuery"
+                                                :select-all="selectAll"
+                                                @edit-record="editRecord"
+                                                @confirmDelete="confirmDelete"
+                                                @toggle-selection="toggleSelection"
+                                ></SubdomainsGrid>
+
+                            </div>
+                            <div class="card-footer">
+                                <v-pagination v-model="state.pagination.current_page" 
+                                              :pages="state.pagination.total_number_of_pages"
+                                              :range-size="state.pagination.range"
+                                              active-color="#DCEDFF"
+                                              @update:modelValue="getRecords"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALAP TÁBLÁZAT -->
+            <!--
+                <div class="row">
+                    <div class="col-lg-12">
+                        
+                        <div class="card">
+
+
+                            <div class="card-header">
+                                <h5 class="card-title">{{ $t('subdomains') }}</h5>
+                                <div class="card-tools">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               v-model="state.searchQuery"
+                                               :placeholder="$t('search')" />
+                                        <div class="input-group-append">
+                                            <div class="btn btn-primary">
+                                                <i class="fas fa-search"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                             <div class="card-body">
                                 <p class="card-text">
                                     {{ $t('subdomains_card_text') }}
@@ -412,14 +443,13 @@
                                             <td>{{ record.name }}</td>
                                             <td>
                                                 <div class="bd-example">
-                                                    <!-- EDIT -->
+                                                    
                                                     <button class="btn btn-primary" 
                                                             type="button" 
                                                             @click="editRecord(record)">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
 
-                                                    <!-- DELETE -->
                                                     <button class="btn btn-danger">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
@@ -430,7 +460,6 @@
                                 </table>
                             </div>
 
-                            <!-- CARD FOOTER -->
                             <div class="card-footer">
                                 <v-pagination v-model="state.pagination.current_page" 
                                               :pages="state.pagination.total_number_of_pages"
@@ -443,7 +472,7 @@
 
                     </div>
                 </div>
-
+            -->
             </div>
         </div>
 
@@ -690,9 +719,32 @@
              :show="state.showDeleteModal">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <div class="modal-header"></div>
-                    <div class="modal-body"></div>
-                    <div class="modal-footer"></div>
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">
+                            <span>{{ $t('subdomains_delete') }}</span>
+                        </h5>
+                        <button type="button" class="close" 
+                                data-dismiss="modal" 
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <h5>{{ $t('subdomains_delete_confirmation') }}</h5>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" 
+                                class="btn btn-secondary"
+                                @click="cancelDelete()">{{ $t('cancel') }}</button>
+                        <button type="submit" 
+                                @click="deleteRecord()"  
+                                class="btn btn-primary"
+                        >{{ state.isEdit ? $t('update') : $t('delete') }}</button>
+                    </div>
+
                 </div>
             </div>
         </div>
