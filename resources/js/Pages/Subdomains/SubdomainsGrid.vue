@@ -1,12 +1,18 @@
 <script setup>
     import { ref, computed } from 'vue';
 
+    const selectAll = ref(false);
     const props = defineProps({
         data: Object,
         columns: Object,
         filterKey: String,
     });
-    const emit = defineEmits('editRecord', 'confirmDelete', 'toggleSelection');
+    const emit = defineEmits(
+        'editRecord', 
+        'confirmDelete', 
+        'toggleSelection', 
+        'selectAllRecord'
+    );
     //const sortKey = ref('id');
     //const sortOrders = ref(
         //props.columns.reduce((o, key) => ((o[key] = 1), o), {})
@@ -21,6 +27,13 @@
     //const capitalize = (str) => {
         //return str.charAt(0).toUpperCase() + str.slice(1);
     //};
+    const selectAllRecord = () => {
+        emit('selectAllRecord', selectAll);
+    };
+
+    const toggleSelection = (record) => {
+        emit('toggleSelection', record);
+    };
 </script>
 
 <template>
@@ -28,18 +41,24 @@
         <thead>
             <tr>
                 <th>
-                    <input type="checkbox"/>
+                    <!-- checkbox a fejlécben -->
+                    <input type="checkbox" 
+                           v-model="selectAll"
+                           @change="selectAllRecord()"/>
                 </th>
                 <th v-for="(value, key) in columns">
-                    {{ key }}
+                    {{ $t(key) }}
                 </th>
-                <th>actions</th>
+                <th>{{ $t('actions') }}</th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="dat in data">
                 <td>
-                    <input type="checkbox"/>
+                    <!-- checkbox a sor elején -->
+                    <input type="checkbox" 
+                           :checked="selectAll" 
+                           @change="toggleSelection(dat)"/>
                 </td>
                 <td v-for="(value, key) in columns">{{ dat[key] }}</td>
                 <td>

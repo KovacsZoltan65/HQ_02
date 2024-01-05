@@ -10,6 +10,7 @@
     "create": "Létrehozás",
     "update": "Frissítés",
     "delete": "Törlés",
+    "refresh": "Frissítés",
 
     "id": "#",
     "name": "Név",

@@ -167,28 +167,29 @@
     //}
     // Törlés megerősítése
     const confirmDelete = (record) => {
-        console.log('confirmDelete', record);
         state.deletingRecord = record;
-        console.log('state.deletingRecord', state.deletingRecord);
 
         $('#deleteModal').modal('show');
     };
     // Rekord törlése
-    const deleteRecord = (record) => {
-        console.log(record);
-        //axios.delete(`/subdomains/${state.deletingRecord.id}`)
-        //.then((response) => {
+    const deleteRecord = () => {
+        //console.log(state.deletingRecord);
+        axios.delete(`/subdomains/${state.deletingRecord.id}`)
+        .then((response) => {
             //
-        //})
-        //.catch((error) => {
+            $('#deleteModal').modal('hide');
+            toastr.success( $t('subdomains_deleted') );
+            state.Records = state.Records.filter(record => record.id!== state.deletingRecord.id);
+        })
+        .catch((error) => {
             //
-        //});
-        $('#deleteModal').modal('hide');
+            console.log('delete subdomain', error);
+        });
     };
 
     // Rekordok csoportos törlése
     const bulkDelete = () => {
-        console.log('bulkDelete');
+        console.log('bulkDelete', selectedRecords);
     };
 
     const cancelDelete = () => {
@@ -200,11 +201,21 @@
     // KIJELÖLÉS
     // =====================
     const toggleSelection = (record) => {
-        console.log('toggleSelection', record);
+        const index = selectedRecords.value.indexOf(record.id);
+        if( index === -1 ) {
+            selectedRecords.value.push(record.id);
+        } else {
+            selectedRecords.value.splice(index, 1);
+        }
     };
     //
-    const selectAllRecord = () => {
-        console.log('selectAllRecord');
+    const selectAllRecord = (status) => {
+        console.log('selectAllRecord', status);
+        if( selectAll.value ) {
+            selectedRecords.value = state.Records.map(record => record.id);;
+        }else{
+            selectedRecords.value = [];
+        }
     };
 
 
@@ -296,25 +307,35 @@
                 
                 <div class="d-flex justify-content-between">
                     <div class="d-flex">
-                        <!-- ADD NEW RECORD -->
-                        <button type="button" 
-                                class="mb-2 btn btn-primary" 
-                                @click="newRecord_init()">
-                            <i class="fa fa-plus-circle mr-1"></i>
-                            {{ $t('subdomains_new') }}
-                        </button>
-
-                        <!-- BULK DELETE -->
-                        <div v-if="selectedRecords.length > 0">
+                        <div class="bd-example">
+                            <!-- ADD NEW RECORD -->
                             <button type="button" 
-                                    @click="bulkDelete" 
-                                    class="ml-2 mb-2 btn btn-danger">
-                                <i class="fa fa-trash mr-1"></i>
-                                {{ $t('delete_selected') }}
+                                    class="btn btn-primary" 
+                                    @click="newRecord_init()"
+                                    :title="$t('subdomains_new')">
+                                <i class="fa fa-plus-circle mr-1"></i>
+                                {{ $t('subdomains_new') }}
                             </button>
-                            <span class="ml-2">Selected {{ selectedRecords.length }} subdomains</span>
-                        </div>
 
+                            <!-- REFRESH -->
+                            <button type="button" 
+                                    class="btn btn-success" 
+                                    :title="$t('refresh')" 
+                                    @click="getRecords()">
+                                <i class="fas fa-sync"></i>
+                            </button>
+
+                            <!-- BULK DELETE -->
+                            <div v-if="selectedRecords.length > 0">
+                                <button type="button" 
+                                        @click="bulkDelete" 
+                                        class="btn btn-danger">
+                                    <i class="fa fa-trash mr-1"></i>
+                                    {{ $t('delete_selected') }}
+                                </button>
+                                <span class="ml-2">Selected {{ selectedRecords.length }} subdomains</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -326,6 +347,7 @@
                             <div class="card-header">
                                 <h5 class="card-title">{{ $t('subdomains') }}</h5>
                                 <div class="card-tools">
+                                    <!-- KERESÉS -->
                                     <div class="input-group input-group-sm">
                                         <input type="text" 
                                                class="form-control" 
@@ -345,7 +367,7 @@
                                 <SubdomainsGrid :data="state.Records" 
                                                 :columns="state.columns" 
                                                 :filter-key="searchQuery"
-                                                :select-all="selectAll"
+                                                :select-all-record="selectAllRecord"
                                                 @edit-record="editRecord"
                                                 @confirmDelete="confirmDelete"
                                                 @toggle-selection="toggleSelection"
