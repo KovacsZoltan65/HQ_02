@@ -17,6 +17,20 @@ use Inertia\Inertia;
 */
 
 Route::post('/language', [App\Http\Controllers\LanguageController::class, 'index'])->name('language');
+Route::post('/generate_password', function(Illuminate\Http\Request $request){
+    
+    //\Log::info( print_r( $request->get('minLength') , true) );
+    //\Log::info( print_r( $request->get('maxLength') , true) );
+    
+    $minLength = $request->get('minLength', 6);
+    $maxLength = $request->get('maxLength', 8);
+    $password = generatePassword($minLength, $maxLength);
+    
+    //\Log::info( print_r( $password , true) );
+    
+    return $password;
+    
+})->name('generatePassword');
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');

@@ -2,13 +2,16 @@
     import { reactive, onMounted, ref } from 'vue';
     import axios from 'axios';
     import { Head, Link } from '@inertiajs/vue3';
-
     import MainLayout from '@/Layouts/MainLayout.vue';
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
+    
+    import SubdomainsGrid from './SubdomainsGrid.vue';
 
     import { useToastr } from '@/toastr';
     const toastr = useToastr();
+
+    const searchQuery = ref('');
 
     const props = defineProps({
         can: {
@@ -44,7 +47,7 @@
             per_page: 10,
             range: 5,
         },
-        searchQuery: '',
+        searchQuesy: '',
 
         columns: {
                    id: { label: '#', is_visible: true, is_sortable: true, is_filterable: true },
@@ -96,74 +99,49 @@
                 name: 'GenerallyACS'
             }
         ],
+
     });
-
-
-    // =====================
-    // JELSZÓ GENERÁLÁS
-    // =====================
-    const genPassword = () => {
-        axios.post(route('generatePassword'), {
-            minLength: 5,
-            maxLength: 10
-        })
-        .then(response => {
-            //console.log(response.data);
-            state.editingRecord.db_password = response.data;
-        })
-        .catch(error => {
-            console.log(error);
-        });
-    };
 
     // =====================
     // ÚJ REKORD
     // =====================
-    function newRecord() {
+    function newRecord(){
         return {
             id: 0,
-            subdomain: 'subdomain_01', 
-            url: 'http://subdomain_01.com', 
-            name: 'subdomain_01',
-            db_host: 'localhost', 
-            db_port: 4406, 
-            db_name: 'ej2_subdomain_p', 
-            db_user: 'ej2_subdomain_p', 
-            db_password: 'password',
-            notification: 1, 
-            state_id: 1, 
-            is_mirror: 0, 
-            sso: 0,
-            access_control_system: 0, 
+            subdomain: '', 
+            url: '', 
+            name: '',
+            db_host: '', 
+            db_port: '', 
+            db_name: '', 
+            db_user: '', 
+            db_password: '',
+            notification: '', 
+            state_id: '', 
+            is_mirror: '', 
+            sso: '',
+            access_control_system: '', 
             last_export: ''
         };
     };
-    // Új rekord előkészítése
+
     const newRecord_init = () => {
+        //console.log('newRecord_init');
         cancelEdit();
         state.isEdit = false;
-
         openEditModal();
     };
-    // Új rekord mentése
-    const createRecord = () => {
-        console.log('createRecord', state.Record);
-        errors.value = '';
 
-        axios.post(route('subdomains'), state.Record)
-        .then(resource => {
-            console.log(resource);
-            closeEditModal();
-        })
-        .catch(error => {
-            console.log(error);
-        });
+    const createRecord = (record) => {
+        errors.value = '';
+        closeEditModal();
     };
 
     // =====================
     // SZERKESZTÉS
     // =====================
     const editRecord = (record) => {
+        console.log('editRecord', record);
         state.editingRecord = record;
         state.isEdit = true;
 
@@ -172,85 +150,108 @@
     // Szerkesztett adatok mentése
     const updateRecord = () => {
         console.log('updateRecord', state.editingRecord);
-    };
+    }
     // Szerkesztés megszakítása
     const cancelEdit = () => {
-        state.editRecord = newRecord();
+        console.log('cancelEdit');
+        state.editingRecord = newRecord();
     };
 
     // =====================
     // REKORD(OK) TÖRLÉSE
     // =====================
+    // Törlés előkészítése
+    //const deleteRecord_init = (record) => {
+    //    console.log('deleteRecord_init', record);
+    //    state.deletingRecord = record;
+    //}
     // Törlés megerősítése
     const confirmDelete = (record) => {
         state.deletingRecord = record;
-        openDeleteModal();
+
+        $('#deleteModal').modal('show');
     };
     // Rekord törlése
     const deleteRecord = () => {
+        //console.log(state.deletingRecord);
         axios.delete(`/subdomains/${state.deletingRecord.id}`)
-        .then(response => {
-            closeDeleteModal();
-            toastr.success($t('subdomains_delete'));
-            state.Records = state.Records.filter(record => record.id !== state.deletingRecord.id);
+        .then((response) => {
+            //
+            $('#deleteModal').modal('hide');
+            toastr.success( $t('subdomains_deleted') );
+            state.Records = state.Records.filter(record => record.id!== state.deletingRecord.id);
         })
-        .catch(error => console.log(error));
+        .catch((error) => {
+            //
+            console.log('delete subdomain', error);
+        });
     };
-    // Kijelölt rekordok törlése
-    const bulkDeleteRecords = () => {
+
+    // Rekordok csoportos törlése
+    const bulkDelete = () => {
         console.log('bulkDelete', selectedRecords.value);
     };
-    // Törlés megszakítása
+
     const cancelDelete = () => {
         state.deletingRecord = newRecord();
         closeDeleteModal();
     };
 
     // =====================
-    // ADATLEKÉRÉS
-    // =====================
-    const getRecords = async (page = state.pagination.current_page) => {
-        axios.get(route('getSubdomains', {
-            filters: state.filter,
-            config: {
-                per_page: state.pagination.per_page,
-            }, page
-        })).then(response => {
-            state.Records = response.data.subdomains.data;
-            selectedRecords.value = [];
-            selectAll.value = false;
-        }).catch(error => {
-            console.log('getRecords error', error);
-        });
-    };
-
-    // =====================
     // KIJELÖLÉS
     // =====================
+    const toggleSelection = (record) => {
+
+        console.log('SubdomainsList toggleSelection');
+
+        const index = selectedRecords.value.indexOf(record.id);
+        if( index === -1 ) {
+            selectedRecords.value.push(record.id);
+        } else {
+            selectAll.value = false;
+            selectedRecords.value.splice(index, 1);
+        }
+
+        console.log('toggleSelection', selectedRecords.value);
+
+    };
     // Összes rekord kijelölése
-    const selectAllRecord = () => {
-        if( selectAll.value ){
+    const selectAllRecord = (status) => {
+
+        console.log('SubdomainsList selectAllRecord');
+
+        selectAll.value = status;
+
+        if( status ) {
             selectedRecords.value = state.Records.map(record => record.id);
         }else{
             selectedRecords.value = [];
         }
-    };
-    // Rekord jelölés váltása
-    const toggleSelection = (id) => {
 
-        const index = selectedRecords.value.indexOf(id);
+        console.log('selectAllRecord', selectedRecords.value);
 
-        if( index === -1 ) {
-            selectedRecords.value.push(id);
-        } else {
-            selectedRecords.value.splice(index, 1);
-        }
-        //console.log('state.Records.length', state.Records.length);
-        //console.log('selectedRecords.value.length', selectedRecords.value.length);
-        //console.log( (state.Records.length === selectedRecords.value.length) );
-        //selectAll.value = (state.Records.length === selectedRecords.value.length);
     };
 
+
+    // =====================
+    // ADATLEKÉRÉS
+    // =====================
+    const getRecords = (page = state.pagination.current_page) => {
+        axios.get(route('getSubdomains', {
+            filters: state.filter,
+            config: {
+                per_page: state.pagination.per_page,
+            },
+            page
+        }))
+        .then((response) => {
+            state.Records = response.data.subdomains.data;
+            selectedRecords.value = [];
+            selectAll
+        })
+        .catch((error) => {});
+    };
+    //
     onMounted(() => {
         getRecords();
     });
@@ -267,12 +268,13 @@
     };
     // szerkesztés
     function openEditModal() {
-        console.log('openEditModal');
+        //console.log('openEditModal');
         $('#editModal').modal('show');
     };
     function closeEditModal() {
         cancelEdit();
 
+        //console.log('closeEditModal');
         $('#editModal').modal('hide');
     };
     // törlés
@@ -282,10 +284,11 @@
     function closeDeleteModal() {
         $('#deleteModal').modal('hide');
     };
+
 </script>
 
 <template>
-    <Head :title="$t('subdomains')"/>
+    <Head :title="$t('subdomains')" />
 
     <MainLayout>
         <!-- CONTENT HEADER -->
@@ -313,45 +316,46 @@
 
         <!-- CONTENT -->
         <div class="content">
-            <div class="container-fluid">
 
+            <div class="container-fluid">
+                
                 <div class="d-flex justify-content-between">
                     <div class="d-flex">
                         <div class="bd-example">
-
                             <!-- ADD NEW RECORD -->
-                            <button type="button"
-                                    class="btn btn-primary"
-                                    :title="$t('subdomains_new')"
-                                    @click="newRecord_init()">
+                            <button type="button" 
+                                    class="btn btn-primary" 
+                                    @click="newRecord_init()"
+                                    :title="$t('subdomains_new')">
                                 <i class="fa fa-plus-circle mr-1"></i>
                                 {{ $t('subdomains_new') }}
                             </button>
 
                             <!-- REFRESH -->
-                            <button type="button"
-                                    class="btn btn-success"
-                                    :title="$t('refresh')"
+                            <button type="button" 
+                                    class="btn btn-success" 
+                                    :title="$t('refresh')" 
                                     @click="getRecords()">
                                 <i class="fas fa-sync"></i>
                             </button>
 
                             <!-- BULK DELETE -->
                             <div v-if="selectedRecords.length > 0">
-                                <button type="button"
-                                        class="btn btn-danger"
-                                        @click="bulkDelete()">
+                                <button type="button" 
+                                        @click="bulkDelete" 
+                                        class="btn btn-danger">
                                     <i class="fa fa-trash mr-1"></i>
                                     {{ $t('delete_selected') }}
                                 </button>
+                                <span class="ml-2">Selected {{ selectedRecords.length }} subdomains</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- TÁBLÁZAT -->
                 <div class="row">
                     <div class="col-lg-12">
-
                         <div class="card">
                             
                             <div class="card-header">
@@ -373,47 +377,116 @@
                             </div>
 
                             <div class="card-body">
-                                <!-- TÁBLÁZAT -->
+                                
+                                <SubdomainsGrid :data="state.Records" 
+                                                :columns="state.columns" 
+                                                :filter-key="searchQuery"
+                                                @select-all-record="selectAllRecord"
+                                                @edit-record="editRecord"
+                                                @confirmDelete="confirmDelete"
+                                                @toggle-selection="toggleSelection"
+                                ></SubdomainsGrid>
+
+                            </div>
+                            <div class="card-footer">
+                                <v-pagination v-model="state.pagination.current_page" 
+                                              :pages="state.pagination.total_number_of_pages"
+                                              :range-size="state.pagination.range"
+                                              active-color="#DCEDFF"
+                                              @update:modelValue="getRecords"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALAP TÁBLÁZAT -->
+            <!--
+                <div class="row">
+                    <div class="col-lg-12">
+                        
+                        <div class="card">
+
+
+                            <div class="card-header">
+                                <h5 class="card-title">{{ $t('subdomains') }}</h5>
+                                <div class="card-tools">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               v-model="state.searchQuery"
+                                               :placeholder="$t('search')" />
+                                        <div class="input-group-append">
+                                            <div class="btn btn-primary">
+                                                <i class="fas fa-search"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="card-body">
+                                <p class="card-text">
+                                    {{ $t('subdomains_card_text') }}
+                                </p>
+
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>
-                                                <!-- checkbox a fejlécben -->
+                                            <th scope="col" class="px-6 py-3">
                                                 <input type="checkbox" 
-                                                       v-model="selectAll"
-                                                       @change="selectAllRecord()"/>
+                                                       v-model="selectAll" 
+                                                       @change="selectAllRecord" />
+                                            </th>
+                                            
+                                            <th scope="col" 
+                                                class="px-6 py-3" 
+                                                v-show="state.columns.id.is_visible">
+                                                {{ $t(state.columns.id.label) }}
                                             </th>
 
-                                            <th v-for="(key, value) in state.columns">
-                                                {{ $t(value) }}
+                                            <th scope="col" 
+                                                class="px-6 py-3" 
+                                                v-show="state.columns.subdomain.is_visible">
+                                                {{ $t(state.columns.subdomain.label) }}
                                             </th>
 
-                                            <th>{{ $t('actions') }}</th>
+                                            <th scope="col" 
+                                                class="px-6 py-3" 
+                                                v-show="state.columns.url.is_visible">
+                                                {{ $t(state.columns.url.label) }}
+                                            </th>
+
+                                            <th scope="col" 
+                                                class="px-6 py-3" 
+                                                v-show="state.columns.name.is_visible">
+                                                {{ $t(state.columns.name.label) }}
+                                            </th>
+
+                                            <th>{{ $t('actions')}}</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr v-for="Record in state.Records">
+                                    <tbody v-for="record in state.Records">
+                                        <tr>
                                             <td>
-                                                <!-- checkbox a sor elején -->
                                                 <input type="checkbox" 
                                                        :checked="selectAll"
-                                                       @change="toggleSelection(Record.id)"/>
+                                                       @change="toggleSelection(record)"/>
                                             </td>
-                                            
-                                            <td v-for="(key, value) in state.columns">
-                                                {{ Record[value] }}
-                                            </td>
-                                            
+                                            <td>{{ record.id }}</td>
+                                            <td>{{ record.subdomain }}</td>
+                                            <td>{{ record.url }}</td>
+                                            <td>{{ record.name }}</td>
                                             <td>
                                                 <div class="bd-example">
-                                                    <button type="button" 
-                                                            class="btn btn-primary"
-                                                            @click="editRecord(Record)">
+                                                    
+                                                    <button class="btn btn-primary" 
+                                                            type="button" 
+                                                            @click="editRecord(record)">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
-                                                    <button type="button" 
-                                                            class="btn btn-danger"
-                                                            @click="confirmDelete(Record)">
+
+                                                    <button class="btn btn-danger">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -422,9 +495,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- /táblázat -->
 
-                            <!-- footer -->
                             <div class="card-footer">
                                 <v-pagination v-model="state.pagination.current_page" 
                                               :pages="state.pagination.total_number_of_pages"
@@ -432,14 +503,13 @@
                                               active-color="#DCEDFF"
                                               @update:modelValue="getRecords"/>
                             </div>
-                            <!-- /footer -->
+
                         </div>
-                        <!-- /card -->
+
                     </div>
                 </div>
-
+            -->
             </div>
-
         </div>
 
         <!-- EDIT MODAL -->
@@ -583,12 +653,10 @@
                                         class="form-control" 
                                         placeholder="$t('db_password_placeholder')" 
                                         aria-label="Recipient's username" 
-                                        aria-describedby="password_generate" 
-                                        v-model="state.editingRecord.db_password">
+                                        aria-describedby="password_generate">
                                     <button class="btn btn-outline-secondary" 
                                             type="button" 
-                                            id="password_generate"
-                                            @click="genPassword()">
+                                            id="password_generate">
                                         <i class="fa fa-fingerprint"></i>
                                     </button>
                                     <div class="invalid-feedback" 
@@ -601,8 +669,6 @@
                         <hr/>
 
                         <div class="row">
-
-                            <!-- NOTIFICATION -->
                             <div class="col form-check">
                                 <input id="notification" name="notification"
                                        class="form-check-input" 
@@ -613,8 +679,6 @@
                                     {{ $t('notification') }}
                                 </label>
                             </div>
-
-                            <!-- IS_MIRROR -->
                             <div class="col form-check">
                                 <input id="is_mirror" name="is_mirror"
                                        class="form-check-input" 
@@ -626,8 +690,6 @@
                                        {{ $t('is_mirror') }}
                                 </label>
                             </div>
-
-                            <!-- SSO -->
                             <div class="col form-check">
                                 <input id="sso" name="sso" 
                                        class="form-check-input" 
@@ -644,7 +706,6 @@
                         <hr/>
 
                         <div class="row">
-
                             <!-- STATE_ID -->
                             <div class="col form-group">
                                 <label>{{ $t('state_id') }}</label>
@@ -652,10 +713,8 @@
                                         class="form-control">
                                     <option v-for="s in state.subdomain_states" 
                                             :key="s.id" 
-                                            :value="s.id"
-                                            :selected="(s.id == state.editingRecord.state_id)">
-                                        {{ s.name }}
-                                    </option>
+                                            :value="s.name"
+                                            :selected="(s.id == state.editingRecord.state_id)">{{ s.name }}</option>
                                 </select>
                             </div>
 
@@ -666,25 +725,18 @@
                                         class="form-control">
                                     <option v-for="acs in state.access_control_systems"
                                             :key="acs.id" 
-                                            :value="acs.id"
-                                            :selected="(acs.id == state.editingRecord.access_control_system)">
-                                        {{ acs.name }}
-                                    </option>
+                                            :value="acs.name"
+                                            :selected="(acs.id == state.editingRecord.access_control_system)"
+                                    >{{ acs.name }}</option>
                                 </select>
                             </div>
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                        
-                        <!-- CANCEL -->
                         <button type="button" 
                                 class="btn btn-secondary"
-                                @click="closeEditModal()">
-                            {{ $t('cancel') }}
-                        </button>
-                        
-                        <!-- SAVE -->
+                                @click="closeEditModal()">{{ $t('cancel') }}</button>
                         <button type="submit" 
                                 @click="state.isEdit? updateRecord() : createRecord()"  
                                 class="btn btn-primary"

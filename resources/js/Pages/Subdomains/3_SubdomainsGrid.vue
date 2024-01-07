@@ -1,6 +1,7 @@
 <script setup>
     import { ref, computed } from 'vue';
 
+    const selectedRecords = ref([]);
     const selectAll = ref(false);
     const props = defineProps({
         data: Object,
@@ -19,20 +20,46 @@
     //);
     //const filteredData = computed(() => {});
 
-    const sortBy = (key) => {
+    //const sortBy = (key) => {
         //sortKey.value = key;
         //sortOrders.value[key] *= -1;
-    };
+    //};
 
     //const capitalize = (str) => {
         //return str.charAt(0).toUpperCase() + str.slice(1);
     //};
-    const selectAllRecord = () => {
-        emit('selectAllRecord', selectAll);
-    };
 
     const toggleSelection = (record) => {
+
+        console.log('SubdomainsGrid toggleSelection');
+
+        const index = selectedRecords.value.indexOf(record.id);
+        //console.log('index', index);
+        if( index === -1 ) {
+            selectedRecords.value.push(record.id);
+        } else {
+            selectAll.value = false;
+            selectedRecords.value.splice(index, 1);
+        }
+
+        console.log('selectAll.value', selectAll.value);
+
         emit('toggleSelection', record);
+    };
+    // Összes rekord kijelölése
+    const selectAllRecord = () => {
+        
+        console.log('SubdomainsGrid selectAllRecord');
+
+        if( selectAll.value ){
+            selectedRecords.value = props.data.map((record) => record.id);
+        }else{
+            selectedRecords.value = [];
+        }
+
+        console.log('selectedRecords.value', selectedRecords.value);
+
+        emit('SelectAllRecord', selectAll.value);
     };
 </script>
 
