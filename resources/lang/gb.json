@@ -58,6 +58,7 @@
     "subdomains_card_text": "List of subdomains",
     "subdomains_new": "New Subdomain",
     "subdomains_edit": "Edit Subdomain",
+    "subdomains_updated": "The subdomain has been successfully updated!",
     "subdomains_created": "The subdomain has been created successfully",
     "subdomains_delete": "Delete Subdomain",
     "subdomains_delete_confirmation": "Are you sure you want to delete this subdomain ?",

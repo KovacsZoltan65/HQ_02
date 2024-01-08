@@ -7,6 +7,8 @@
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
 
+    import { trans } from 'laravel-vue-i18n';
+
     import { useToastr } from '@/toastr';
     const toastr = useToastr();
 
@@ -171,11 +173,41 @@
     };
     // Szerkesztett adatok mentése
     const updateRecord = () => {
-        console.log('updateRecord', state.editingRecord);
+        errors.value = '';
+
+        axios.put(route('subdomains_update', {subdomain: state.editingRecord.id}), {
+            id: state.editingRecord.id,
+            subdomain: state.editingRecord.subdomain,
+            url: state.editingRecord.url,
+            name: state.editingRecord.name,
+            db_host: state.editingRecord.db_host,
+            db_port: state.editingRecord.db_port,
+            db_name: state.editingRecord.db_name,
+            db_user: state.editingRecord.db_user,
+            db_password: state.editingRecord.db_password,
+            notification: state.editingRecord.notification,
+            state_id: state.editingRecord.state_id,
+            is_mirror: state.editingRecord.is_mirror,
+            sso: state.editingRecord.sso,
+            access_control_system: state.editingRecord.access_control_system,
+            last_export: state.editingRecord.last_export
+        })
+        .then(response => {
+            cancelEdit();
+            closeEditModal();
+
+            toastr.success(trans('subdomains_updated'));
+            //toastr.success('ASDASDAS');
+        })
+        .catch(error => {
+            console.log('error', error);
+            //errors.value = error.response.data.errors;
+        });
     };
     // Szerkesztés megszakítása
     const cancelEdit = () => {
         state.editRecord = newRecord();
+        state.isEdit = false;
     };
 
     // =====================
@@ -191,7 +223,7 @@
         axios.delete(`/subdomains/${state.deletingRecord.id}`)
         .then(response => {
             closeDeleteModal();
-            toastr.success($t('subdomains_delete'));
+            toastr.success(trans('subdomains_delete'));
             state.Records = state.Records.filter(record => record.id !== state.deletingRecord.id);
         })
         .catch(error => console.log(error));
@@ -267,7 +299,6 @@
     };
     // szerkesztés
     function openEditModal() {
-        console.log('openEditModal');
         $('#editModal').modal('show');
     };
     function closeEditModal() {

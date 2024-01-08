@@ -58,6 +58,7 @@
     "subdomains_card_text": "Aldomain-ek listája",
     "subdomains_new": "Új aldomain",
     "subdomains_edit": "Aldomain szerkesztése",
+    "subdomains_updated": "Az aldomain sikeresen frissítve!",
     "subdomains_delete": "Aldomain törlése",
     "subdomains_delete_confirmation": "Biztosan törli ezt az aldomaint?",
     "subdomains_created": "Az aldomain sikeresen elkészült",
