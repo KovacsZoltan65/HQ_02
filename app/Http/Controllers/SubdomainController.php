@@ -56,8 +56,7 @@ class SubdomainController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSubdomainRequest $request, $id)
-    {
+    public function update(UpdateSubdomainRequest $request, $id) {
         $subdomain = $this->repository->update($request->all(), $id);
         
         return response()->json($subdomain, Response::HTTP_OK);
@@ -66,8 +65,7 @@ class SubdomainController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Subdomain $subdomain)
-    {
+    public function destroy(Subdomain $subdomain) {
         $subdomain = $this->repository->delete($subdomain->id);
         
         return response()->json($subdomain, Response::HTTP_OK);

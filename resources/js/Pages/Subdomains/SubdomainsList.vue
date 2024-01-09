@@ -223,14 +223,25 @@
         axios.delete(`/subdomains/${state.deletingRecord.id}`)
         .then(response => {
             closeDeleteModal();
-            toastr.success(trans('subdomains_delete'));
             state.Records = state.Records.filter(record => record.id !== state.deletingRecord.id);
+
+            toastr.success(trans('subdomains_deleted'));
         })
         .catch(error => console.log(error));
     };
     // Kijelölt rekordok törlése
-    const bulkDeleteRecords = () => {
-        console.log('bulkDelete', selectedRecords.value);
+    const bulkDelete = () => {
+        //console.log('bulkDelete', selectedRecords.value);
+        axios.delete()
+        .then(resource => {
+            state.Records = state.Records.filter(s => !selectedRecords.value.includes(s.id) );
+            selectedRecords.value = [];
+            selectAll.value = false;
+            toastr.success(trans('subdomains_bulk_deleted'));
+        })
+        .catch(error => {
+            //
+        });
     };
     // Törlés megszakítása
     const cancelDelete = () => {
@@ -249,6 +260,7 @@
             }, page
         })).then(response => {
             state.Records = response.data.subdomains.data;
+            //console.log(state.Records);
             selectedRecords.value = [];
             selectAll.value = false;
         }).catch(error => {
