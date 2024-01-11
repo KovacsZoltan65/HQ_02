@@ -74,27 +74,31 @@ Route::resource('/users', \App\Http\Controllers\Admin\UsersController::class
     'restore' => 'users_restore',
 ]);
 
-// ===============================
-// SUBDOMAINS
-// ===============================
-Route::get(
-    '/getSubdomains', 
-    [\App\Http\Controllers\SubdomainController::class, 'getSubdomains']
-)->name('getSubdomains');
+Route::middleware('auth')->group(function(){
 
-Route::get('/getSubdomains2', [\App\Http\Controllers\SubdomainController::class, 'getSubdomains2'])->name('getSubdomains2');
+    // ===============================
+    // SUBDOMAINS
+    // ===============================
+    Route::get(
+        '/getSubdomains', 
+        [\App\Http\Controllers\SubdomainController::class, 'getSubdomains']
+    )->name('getSubdomains');
 
-Route::delete('/subdomains/{subdomain}/bulkDelete', [\App\Http\Controllers\SubdomainController::class, 'bulkDelete'])->name('subdomains_bulkDelete');
-Route::post('/subdomains/{subdomain}/restore/', [\App\Http\Controllers\SubdomainController::class, 'restore'])->name('subdomains_restore');
+    Route::get('/getSubdomains2', [\App\Http\Controllers\SubdomainController::class, 'getSubdomains2'])->name('getSubdomains2');
 
-Route::resource('/subdomains', \App\Http\Controllers\SubdomainController::class)->names([
-      'index' => 'subdomains',
-     'create' => 'subdomains_create',
-      'store' => 'subdomains_store',
-       'view' => 'subdomains_view',
-       'edit' => 'subdomains_edit',
-     'update' => 'subdomains_update',
-    'destroy' => 'subdomains_destroy',
-]);
+    Route::delete('/subdomains/{subdomain}/bulkDelete', [\App\Http\Controllers\SubdomainController::class, 'bulkDelete'])->name('subdomains_bulkDelete');
+    Route::post('/subdomains/{subdomain}/restore/', [\App\Http\Controllers\SubdomainController::class, 'restore'])->name('subdomains_restore');
+
+    Route::resource('/subdomains', \App\Http\Controllers\SubdomainController::class)->names([
+        'index' => 'subdomains',
+        'create' => 'subdomains_create',
+        'store' => 'subdomains_store',
+        'view' => 'subdomains_view',
+        'edit' => 'subdomains_edit',
+        'update' => 'subdomains_update',
+        'destroy' => 'subdomains_destroy',
+    ]);
+
+});
 
 require __DIR__.'/auth.php';

@@ -14,6 +14,7 @@
         @inertiaHead
     </head>
     <body class="hold-transition sidebar-mini">
+        
         @inertia
         
     </body>
