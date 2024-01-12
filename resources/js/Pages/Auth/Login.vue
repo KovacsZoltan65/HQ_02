@@ -4,34 +4,11 @@
     import '../../../../node_modules/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css';
 
     import { Head, Link, useForm } from '@inertiajs/vue3';
-    import GuestLayout from '@/Layouts/GuestLayout.vue';
+    import LoginLayout from '@/Layouts/LoginLayout.vue';
 
-    onMounted(() => {
-        console.log('onMounted');
-        
-        setTimeout(function () {
-            console.log('onMounted setTimeout');
-            $(document.body).removeClass();
-
-            $(document.body).addClass('hold-transition');
-            $(document.body).addClass('login-page');
-        }, 300);
-    });
-
-    onUnmounted(() => {
-        console.log('onUnmounted');
-        setTimeout(function () {
-            console.log('onUnmounted setTimeout');
-            $(document.body).removeClass();
-
-            $(document.body).addClass('hold-transition');
-            $(document.body).addClass('sidebar-mini');
-            $(document.body).addClass('layout-fixed');
-        }, 300);
-    });
 </script>
 <template>
-    <GuestLayout>
+    <LoginLayout>
 
         <Head :title="$t('login')" />
 
@@ -92,10 +69,12 @@
                     <!-- /.social-auth-links -->
 
                     <p class="mb-1">
-                        <a href="forgot-password.html">I forgot my password</a>
+                        <!--<a href="forgot-password.html">I forgot my password</a>-->
+                        <Link :href="route('password.request')">I forgot my password</Link>
                     </p>
                     <p class="mb-0">
-                        <a href="register.html" class="text-center">Register a new membership</a>
+                        <!--<a href="register.html" class="text-center">Register a new membership</a>-->
+                        <Link :href="route('register')">Register a new membership</Link>
                     </p>
                 </div>
                 <!-- /.card-body -->
@@ -103,7 +82,7 @@
             <!-- /.card -->
         </div>
 
-    </GuestLayout>
+    </LoginLayout>
 
 </template>
 
