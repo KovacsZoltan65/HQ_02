@@ -15,6 +15,7 @@
     "id": "#",
     "name": "Név",
     "name_placeholder": "Adja meg a teljes nevet",
+    "full_name": "Teljes név",
     "email": "Email",
     "email_placeholder": "Addja meg az email címet",
     "language": "Nyelv",
@@ -22,6 +23,7 @@
     "password": "Jelszó",
     "password_placeholder": "Addja meg a jelszót",
     "confirm_password": "Jelszó megerősítés",
+    "retype_password": "Gépelje be újra a jelszót",
     "url": "URL",
     "url_placeholder": "URL",
     
@@ -42,9 +44,20 @@
     "state_id": "Állapot",
     "access_control_system": "Beléptető rendszer",
 
+    "register": "Regisztáció",
+    "register_title": "Regisztráljon új tagságot",
+    
     "login": "Bejelentkezés",
+    "login_title": "Jelentkezzen be a munkamenet megkezdéséhez",
+    "login_button": "Bejelentkezés",
     "logout": "Kijelentkezés",
     "page_expired": "Lejárt oldal",
+    "register_new_membership": "Regisztráljon új tagságot",
+
+    "remember_me": "Emlékezz rám",
+    
+    "request_new_password": "Új jelszó kérése",
+    "forgot_password_title": "Elfelejtettem a jelszavadat.",
 
     "users": "Felhasználók",
     "users_new": "Új felhasználó",

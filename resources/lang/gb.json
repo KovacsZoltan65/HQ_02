@@ -11,10 +11,11 @@
     "update": "Update",
     "delete": "Delete",
     "refresh": "Refresh",
-
+    
     "id": "#",
     "name": "Name",
     "name_placeholder": "Enter full name",
+    "full_name": "Full Name",
     "email": "Email",
     "email_placeholder": "Enter email address",
     "language": "Language",
@@ -22,6 +23,7 @@
     "password": "Password",
     "password_placeholder": "Enter password",
     "confirm_password": "Confirm Password",
+    "retype_password": "Retype password",
     "url": "URL",
     "url_placeholder": "URL",
     
@@ -42,9 +44,20 @@
     "state_id": "Satate",
     "access_control_system": "Access Control System",
 
+    "register": "Register",
+    "register_title": "Register a new membership",
+    
     "login": "Login",
+    "login_title": "Sign in to start your session",
+    "login_button": "Sign In",
     "logout": "Logout",
     "page_expired": "Page Expired",
+    "register_new_membership": "Register a new membership",
+    
+    "remember_me": "Remember Me",
+    
+    "request_new_password": "Request new password",
+    "forgot_password_title": "I forgot my password",
 
     "users": "Users",
     "users_new": "New User",
