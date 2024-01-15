@@ -1,10 +1,9 @@
 <script setup>
-    //import { reactive, onMounted, onUnmounted, ref } from 'vue';
-    
-    import '../../../../node_modules/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css';
-
     import { Head, Link, useForm } from '@inertiajs/vue3';
     import LoginLayout from '@/Layouts/LoginLayout.vue';
+    import InputError from '@/Components/InputError.vue';
+    
+    import '../../../../node_modules/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css';
 
     defineProps({
         status: String
@@ -20,7 +19,7 @@
 <template>
     <LoginLayout>
 
-        <Head :title="$t('forgot_password')" />
+        <Head :title="$t('confirm_password')" />
 
         <div class="login-box">
             
@@ -29,12 +28,17 @@
             </div>
 
             <div class="card card-outline card-primary">
+
                 <div class="card-header text-center">
-                    <a href="../../index2.html" 
-                       class="h1"><b>Admin</b>LTE</a>
+                    <Link :href="route('dashboard')" class="h1">
+                        <b>Admin</b>LTE
+                    </Link>
                 </div>
+
                 <div class="card-body">
-                    <p class="login-box-msg">{{ $t('forgot_password_title') }}</p>
+                    
+                    <p class="login-box-msg">{{ $t('confirm_password_title') }}</p>
+
                     <form @submit.prevent="submit">
 
                         <!-- EMAIL -->
@@ -48,6 +52,7 @@
                                 </div>
                             </div>
                         </div>
+                        <InputError class="mt-2" :message="form.errors.password" />
 
                         <!-- ÚJ JELSZÓ KÉRÉSE -->
                         <div class="row">

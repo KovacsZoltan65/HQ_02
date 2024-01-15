@@ -37,14 +37,17 @@
         <div class="login-box">
             <!-- /.login-logo -->
             <div class="card card-outline card-primary">
+                
                 <div class="card-header text-center">
-                    <a href="../../index2.html" 
-                       class="h1"><b>Admin</b>LTE</a>
+                    <Link :href="route('dashboard')" class="h1">
+                        <b>Admin</b>LTE
+                    </Link>
                 </div>
+
                 <div class="card-body">
                     <p class="login-box-msg">{{ $t('login_title') }}</p>
 
-                    <form @submit.prevent="susbmit">
+                    <form @submit.prevent="submit">
                         
                         <!-- EMAIL -->
                         <div class="input-group mb-3">
@@ -119,6 +122,10 @@
                     </p>
                 </div>
                 <!-- /.card-body -->
+                <div class="card-footer">
+                    superadmin@sample.com | password
+                </div>
+
             </div>
             <!-- /.card -->
         </div>
