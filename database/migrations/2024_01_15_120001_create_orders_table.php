@@ -12,11 +12,11 @@ return new class extends Migration
 	 */
 	public function up()
 	{
-		//Schema::create('subdomains', function(Blueprint $table) {
-        //    $table->increments('id');
+		Schema::create('orders', function(Blueprint $table) {
+            $table->increments('id');
 
-        //    $table->timestamps();
-		//});
+            $table->timestamps();
+		});
 	}
 
 	/**
@@ -26,6 +26,6 @@ return new class extends Migration
 	 */
 	public function down()
 	{
-		Schema::drop('subdomains');
+		Schema::drop('orders');
 	}
 };

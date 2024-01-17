@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 
@@ -20,6 +22,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Schema::defaultStringLength(191);
+
+        Inertia::share([
+            'errors' => function(){
+                return Session::get('errors') 
+                    ? Session::get('errors')->getBag('default')->getMessages() 
+                    : (object)[];
+            },
+        ]);
+
         Inertia::share([
             // ...
             'locale' => function(){
@@ -27,11 +39,17 @@ class AppServiceProvider extends ServiceProvider
             },
             // Elérhető nyelvek
             'languages' => config('app.available_locales'),
-            //'language' => function(){
-            //    return translations(
-            //        resource_path('lang/' . app()->getLocale() . '.json')
-            //    );
-            //},
         ]);
+
+        Inertia::share('flash', function(){
+            return [
+                'message' => Session::get('message')
+            ];
+        });
+
+        Inertia::share('csrf_token', function(){
+            return csrf_token();
+        });
+
     }
 }

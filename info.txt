@@ -2,7 +2,7 @@ https://www.youtube.com/watch?v=MjkamZQJY_8&ab_channel=JohnWeeksDev
 https://www.youtube.com/watch?v=xetBK8xyE1g&list=PLGg3vnFos8GN3MAvxbI-QXKSkBKi2yIFO&index=2&ab_channel=Clovon
 
 =====================
-= ÉRDEMER MEGNÉZNI
+= ÉRDEMES MEGNÉZNI
 =====================
 https://laravel.hu/cikk/ray-bemutato
 https://spatie.be/docs/ray/v1/introduction
@@ -24,6 +24,26 @@ npm install toastr
 npm install lodash
 npm install moment
 npm install laravel-vue-pagination
+
+// ---------------------------------------
+// Roles and Permissions
+// ---------------------------------------
+https://laraveltuts.com/laravel-9-vue-js-roles-and-permission-vite-js/
+
+composer require spatie/laravel-permission
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+php artisan optimize:clear
+# or
+php artisan config:clear
+
+php artisan migrate
+
+superadmin@laraveltuts.com
+password
+admin@laraveltuts.com
+password
+test@laraveltuts.com
+password
 
 ======================
 = VALIDATION

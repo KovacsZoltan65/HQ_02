@@ -16,6 +16,12 @@ use Inertia\Inertia;
 |
 */
 
+Route::get(
+    '/', 
+    [App\Http\Controllers\HomeController::class, 'index']
+)->name('dashboard');
+
+
 Route::post('/language', [App\Http\Controllers\LanguageController::class, 'index'])->name('language');
 Route::post('/generate_password', function(Illuminate\Http\Request $request){
     
@@ -31,9 +37,6 @@ Route::post('/generate_password', function(Illuminate\Http\Request $request){
     return $password;
     
 })->name('generatePassword');
-
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
-Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
