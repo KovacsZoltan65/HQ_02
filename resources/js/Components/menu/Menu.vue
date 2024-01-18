@@ -41,12 +41,24 @@
                 </Link>
             </li>
 
+            <!-- SUBDOMAINS -->
             <li class="nav-item">
                 <Link :href="route('subdomains')" 
                    class="nav-link">
                     <i class="nav-icon fas fa-building"></i>
                     <p>
                         {{ $t('subdomains') }}
+                    </p>
+                </Link>
+            </li>
+
+            <!-- ROLES -->
+            <li class="nav-item">
+                <Link :href="route('roles')" 
+                   class="nav-link">
+                    <i class="nav-icon fas fa-dirdle-user"></i>
+                    <p>
+                        {{ $t('roles') }}
                     </p>
                 </Link>
             </li>

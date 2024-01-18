@@ -45,6 +45,16 @@ password
 test@laraveltuts.com
 password
 
+php artisan make:model Role
+php artisan make:controller Admin\RoleController --resource
+php artisan make:request CreateRoleRequest
+php artisan make:request UpdateRoleRequest
+php artisan make:repository Role
+php artisan make:criteria Role
+php artisan make:migration CreateRoleTable
+php artisan make:seeder RoleSeeder
+php artisan make:factory RoleFactory
+
 ======================
 = VALIDATION
 ======================

@@ -6,11 +6,11 @@ use Prettus\Repository\Contracts\CriteriaInterface;
 use Prettus\Repository\Contracts\RepositoryInterface;
 
 /**
- * Class SubdomainCriteriaCriteria.
+ * Class RoleCriteriaCriteria.
  *
  * @package namespace App\Criteria;
  */
-class SubdomainCriteriaCriteria implements CriteriaInterface
+class RoleCriteria implements CriteriaInterface
 {
     /**
      * Apply criteria in query repository

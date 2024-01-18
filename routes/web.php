@@ -100,4 +100,25 @@ Route::resource('/subdomains', \App\Http\Controllers\SubdomainController::class)
     'destroy' => 'subdomains_destroy',
 ]);
 
+// ===============================
+// ROLES
+// ===============================
+Route::get(
+    '/getRoles', 
+    [\App\Http\Controllers\Admin\RoleController::class, 'getRoles']
+)->name('getRoles');
+
+Route::delete('/roles/{role}/bulkDelete', [\App\Http\Controllers\Admin\RoleController::class, 'bulkDelete'])->name('roles_bulkDelete');
+Route::post('/roles/{role}/restore/', [\App\Http\Controllers\Admin\RoleController::class, 'restore'])->name('roles_restore');
+
+Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->names([
+      'index' => 'roles',
+     'create' => 'roles_create',
+      'store' => 'roles_store',
+       'view' => 'roles_view',
+       'edit' => 'roles_edit',
+     'update' => 'roles_update',
+    'destroy' => 'roles_destroy',
+]);
+
 require __DIR__.'/auth.php';
