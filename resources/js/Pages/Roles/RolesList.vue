@@ -104,7 +104,23 @@
     // =====================
     // ADATLEKÉRÉS
     // =====================
-    const getRecords = async (page = state.pagination.current_page) => {};
+    const getRecords = async (page = state.pagination.current_page) => {
+        axios.get(route('getRoles'), {
+            filters: state.filters,
+            config: {
+                per_page: state.pagination.per_page,
+            }, page
+        }).then((response) => {
+            
+            state.Records = response.data.roles.data;
+            
+            selectedRecords.value = [];
+            selectAll.value = false;
+
+        }).catch((error) => {
+            console.log(error);
+        });
+    };
 
     // =====================
     // KIJELÖLÉS
@@ -175,7 +191,7 @@
                                     :title="$t('subdomains_new')"
                                     @click="newRecord_init()">
                                 <i class="fa fa-plus-circle mr-1"></i>
-                                {{ $t('subdomains_new') }}
+                                {{ $t('roles_new') }}
                             </button>
 
                             <!-- REFRESH -->

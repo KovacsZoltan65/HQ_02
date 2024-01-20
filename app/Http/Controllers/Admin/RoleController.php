@@ -8,7 +8,7 @@ use App\Http\Requests\UpdateRoleRequest;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Models\Role;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
 use Inertia\Inertia;
 
 class RoleController extends Controller
