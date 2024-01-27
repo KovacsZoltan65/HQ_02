@@ -108,6 +108,8 @@ Route::get(
     [\App\Http\Controllers\Admin\RoleController::class, 'getRoles']
 )->name('getRoles');
 
+Route::get('/getRoles2', [\App\Http\Controllers\Admin\RoleController::class, 'getRoles2'])->name('getRoles2');
+
 Route::delete('/roles/{role}/bulkDelete', [\App\Http\Controllers\Admin\RoleController::class, 'bulkDelete'])->name('roles_bulkDelete');
 Route::post('/roles/{role}/restore/', [\App\Http\Controllers\Admin\RoleController::class, 'restore'])->name('roles_restore');
 

@@ -30,9 +30,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Roles/RolesList', [
-            'can' => $this->_getRoles(),
-        ]);
+        return Inertia::render('Roles/RolesList');
     }
     
     public function getRoles(Request $request){
@@ -140,7 +138,8 @@ class RoleController extends Controller
      */
     public function update(UpdateRoleRequest $request, $id)
     {
-        $this->repository->update($request->all(), $id);
+        //dd($request->all(), $id);
+        //$this->repository->update($request->all(), $id);
         
         return redirect()->back()->with('message', __('roles_updated'));
     }

@@ -114,3 +114,17 @@ php artisan make:criteria SubdomainCriteria
 php artisan make:migration CreateSubdomainTable
 php artisan make:seeder SubdomainSeeder
 php artisan make:factory SubdomainFactory
+
+
+======================
+= PERMISSIONS
+======================
+php artisan make:model Permission
+php artisan make:controller PermissionController --resource
+php artisan make:request CreatePermissionRequest
+php artisan make:request UpdatePermissionRequest
+php artisan make:repository Permission
+php artisan make:criteria PermissionCriteria
+php artisan make:migration CreatePermissionTable
+php artisan make:seeder PermissionSeeder
+php artisan make:factory PermissionFactory

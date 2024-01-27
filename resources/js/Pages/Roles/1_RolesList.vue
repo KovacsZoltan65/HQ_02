@@ -1,5 +1,5 @@
 <script setup>
-    import { reactive, onMounted, ref } from 'vue';
+    import { reactive, onMounted, ref, watch } from 'vue';
     import axios from 'axios';
     import { Head, Link } from '@inertiajs/vue3';
 
@@ -9,8 +9,23 @@
 
     import { trans } from 'laravel-vue-i18n';
 
-    import { useToastr } from '@/toastr';
-    const toastr = useToastr();
+    import Swal from 'sweetalert2';
+    import 'sweetalert2/dist/sweetalert2.min.css';
+
+    const alerta = Swal.mixin({
+        buttonsStyling: true
+    });
+    const delete_alert = Swal.mixin({
+        buttonsStyling: true,
+        title: trans('roles_delete_confirmation'),
+        icon: 'question',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33'
+    });
+    //import { useToastr } from '@/toastr';
+    //const toastr = useToastr();
+
+    const local_storage_column_key = 'ln_roles_grid_columns';
 
     const props = defineProps({
         can: {
@@ -49,10 +64,14 @@
         searchQuery: '',
 
         columns: {
-            id: { label: '#', is_visible: true, is_sortable: true, is_filterable: true },
-            name: { label: 'name', is_visible: true, is_sortable: true, is_filterable: true },
-            guard_name: { label: 'guard_name', is_visible: true, is_sortable: true, is_filterable: true },
+                   id: { label: '#', is_visible: true, is_sortable: true, is_filterable: true },
+                 name: { label: 'name', is_visible: true, is_sortable: true, is_filterable: true },
+           guard_name: { label: 'guard_name', is_visible: true, is_sortable: true, is_filterable: true },
         },
+    });
+
+    watch(state.columns, (new_value, old_value) => {
+        localStorage.setItem(local_storage_column_key, JSON.stringify(new_value));
     });
 
     // =====================
@@ -61,10 +80,11 @@
     function newRecord() {
         return {
             id: 0,
-            name: 'role_01',
-            guard_name: 'web',
+            name: 'Role 01',
+            guard_name: ''
         };
     };
+
     // Új rekord előkészítése
     const newRecord_init = () => {
         cancelEdit();
@@ -72,14 +92,13 @@
 
         openEditModal();
     };
+
     // Új rekord mentése
     const createRecord = () => {
-        console.log('createRecord', state.Record);
         errors.value = '';
 
         axios.post(route('roles'), state.Record)
-        .then(resource => {
-            console.log(resource);
+        .then(response => {
             closeEditModal();
         })
         .catch(error => {
@@ -103,18 +122,17 @@
         axios.put(route('roles_update', {role: state.editingRecord.id}), {
             id: state.editingRecord.id,
             name: state.editingRecord.name,
-            guard_name: state.editingRecord.guard_name,
+            guard_name: state.editingRecord.guard_name
         })
         .then(response => {
-            cancelEdit();
-            closeEditModal();
+            console.log('response', response);
+            //cancelEdit();
+            //closeEditModal();
 
-            toastr.success(trans('roles_updated'));
-            //toastr.success('ASDASDAS');
+            //toastr.success(trans('roles_updated'));
         })
         .catch(error => {
-            console.log('error', error);
-            //errors.value = error.response.data.errors;
+            console.log(error);
         });
     };
     // Szerkesztés megszakítása
@@ -133,28 +151,25 @@
     };
     // Rekord törlése
     const deleteRecord = () => {
-        axios.delete(`/roles/${state.deletingRecord.id}`)
+        axios.delete()
         .then(response => {
             closeDeleteModal();
             state.Records = state.Records.filter(record => record.id !== state.deletingRecord.id);
 
             toastr.success(trans('roles_deleted'));
         })
-        .catch(error => console.log(error));
+        .catch(error => { console.log(error); });
     };
     // Kijelölt rekordok törlése
     const bulkDelete = () => {
-        //console.log('bulkDelete', selectedRecords.value);
         axios.delete(route('roles_bulkDelete', {data: {}}))
-        .then(resource => {
+        .then(response => {
             state.Records = state.Records.filter(s => !selectedRecords.value.includes(s.id) );
             selectedRecords.value = [];
             selectAll.value = false;
-            toastr.success(trans('roles_bulk_deleted'));
+            toastr.success(trans('routes_bulk_deleted'));
         })
-        .catch(error => {
-            //
-        });
+        .catch(error => { console.log(error); });
     };
     // Törlés megszakítása
     const cancelDelete = () => {
@@ -166,18 +181,20 @@
     // ADATLEKÉRÉS
     // =====================
     const getRecords = async (page = state.pagination.current_page) => {
-        axios.get(route('getRoles', {
-            filters: state.filter,
+        axios.get(route('getRoles'), {
+            filters: state.filters,
             config: {
                 per_page: state.pagination.per_page,
             }, page
-        })).then(response => {
+        }).then((response) => {
+            
             state.Records = response.data.roles.data;
-            //console.log(state.Records);
+            
             selectedRecords.value = [];
             selectAll.value = false;
-        }).catch(error => {
-            console.log('getRecords error', error);
+
+        }).catch((error) => {
+            console.log(error);
         });
     };
 
@@ -202,14 +219,22 @@
         } else {
             selectedRecords.value.splice(index, 1);
         }
-        //console.log('state.Records.length', state.Records.length);
-        //console.log('selectedRecords.value.length', selectedRecords.value.length);
-        //console.log( (state.Records.length === selectedRecords.value.length) );
-        //selectAll.value = (state.Records.length === selectedRecords.value.length);
     };
+
+    const settings_init = () => {
+        openSettingsModal();
+    }
 
     onMounted(() => {
         getRecords();
+
+        let columns = localStorage.getItem(local_storage_column_key);
+        if (columns) {
+            columns = JSON.parse(columns); 
+            for (const column_name in columns) { 
+                state.columns[column_name] = columns[column_name]; 
+            }
+        }
     });
 
     // =====================
@@ -273,15 +298,25 @@
 
                 <div class="d-flex justify-content-between">
                     <div class="d-flex">
+
+                        <!-- BUTTONS -->
                         <div class="bd-example">
 
                             <!-- ADD NEW RECORD -->
                             <button type="button"
                                     class="btn btn-primary"
-                                    :title="$t('subdomains_new')"
+                                    :title="$t('roles_new')"
                                     @click="newRecord_init()">
                                 <i class="fa fa-plus-circle mr-1"></i>
-                                {{ $t('subdomains_new') }}
+                                {{ $t('roles_new') }}
+                            </button>
+
+                            <!-- SETTINGS -->
+                            <button type="button" 
+                                    class="btn btn-primary" 
+                                    :title="$t('settings')" 
+                                    @click="settings_init">
+                                <i class="fas fa-tasks"></i>
                             </button>
 
                             <!-- REFRESH -->
@@ -293,14 +328,13 @@
                             </button>
 
                             <!-- BULK DELETE -->
-                            <div v-if="selectedRecords.length > 0">
-                                <button type="button"
-                                        class="btn btn-danger"
-                                        @click="bulkDelete()">
-                                    <i class="fa fa-trash mr-1"></i>
-                                    {{ $t('delete_selected') }}
-                                </button>
-                            </div>
+                            <button type="button" v-if="selectedRecords.length > 0"
+                                    class="btn btn-danger"
+                                    @click="bulkDelete()">
+                                <i class="fa fa-trash mr-1"></i>
+                                {{ $t('delete_selected') }}
+                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -331,6 +365,8 @@
                             <div class="card-body">
                                 <!-- TÁBLÁZAT -->
                                 <table class="table table-bordered">
+                                    
+                                    <!-- HEADER -->
                                     <thead>
                                         <tr>
                                             <th>
@@ -340,13 +376,17 @@
                                                        @change="selectAllRecord()"/>
                                             </th>
 
-                                            <th v-for="(key, value) in state.columns">
+                                            <th v-for="(key, value) in state.columns" 
+                                                scope="col" 
+                                                v-show="key.is_visible">
                                                 {{ $t(value) }}
                                             </th>
 
                                             <th>{{ $t('actions') }}</th>
                                         </tr>
                                     </thead>
+
+                                    <!-- BODY -->
                                     <tbody>
                                         <tr v-for="Record in state.Records">
                                             <td>
@@ -356,10 +396,12 @@
                                                        @change="toggleSelection(Record.id)"/>
                                             </td>
                                             
-                                            <td v-for="(key, value) in state.columns">
+                                            <td v-for="(key, value) in state.columns" 
+                                                v-show="key.is_visible">
                                                 {{ Record[value] }}
                                             </td>
                                             
+                                            <!-- GOMBOK -->
                                             <td>
                                                 <div class="bd-example">
                                                     <button type="button" 
@@ -408,10 +450,11 @@
             <div class="modal-dialog modal-dialog-scrollable modal-lg" 
                  role="document">
                 <div class="modal-content">
+
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">
-                            <span v-if="state.isEdit">{{ $t('subdomains_edit') }}</span>
-                            <span v-else>{{ $t('subdomains_new') }}</span>
+                            <span v-if="state.isEdit">{{ $t('roles_edit') }}</span>
+                            <span v-else>{{ $t('roles_new') }}</span>
                         </h5>
                         <button type="button" class="close" 
                                 data-dismiss="modal" 
@@ -419,55 +462,57 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+                    
                     <div class="modal-body">
-                        <div>
-                            <!-- NAME -->
-                            <div class="form-group">
-                                <label>{{ $t('name') }}</label>
-                                
-                                <input name="name" type="text" 
-                                    class="form-control" 
-                                    :class="errors?.name ? 'is-invalid' : 'is-valid'"
-                                    aria-describedby="nameHelp" 
-                                    :placeholder="$t('name_placeholder')"
-                                    v-model="state.editingRecord.name"/>
-                                <div class="invalid-feedback" 
-                                    v-if="errors?.name">{{ errors.name[0] }}</div>
+                            
+                        <!-- NAME -->
+                        <div class="form-group">
+                            <label>{{ $t('name') }}</label>
+                            
+                            <input id="name" name="name" type="text" 
+                                class="form-control" 
+                                :class="errors?.name ? 'is-invalid' : 'is-valid'"
+                                aria-describedby="nameHelp" 
+                                :placeholder="$t('name_placeholder')"
+                                v-model="state.editingRecord.name"/>
+                            <div class="invalid-feedback" 
+                                v-if="errors?.name">{{ errors.name[0] }}</div>
 
-                            </div>
+                        </div>
 
-                            <!-- GUARD_NAME -->
-                            <div class="form-group">
-                                <label>{{ $t('guard_name') }}</label>
-                                
-                                <input name="guard_name" type="text" 
-                                    class="form-control" 
+                        <!-- GUARD_NAME -->
+                        <div class="form-group">
+                            <label>{{ $t('guard_name') }}</label>
+                            
+                            <input id="guard_name" name="guard_name" 
+                                    type="text" class="form-control" 
                                     :class="errors?.guard_name ? 'is-invalid' : 'is-valid'"
-                                    aria-describedby="subdomainHelp" 
-                                    :placeholder="$t('subdomain_placeholder')"
+                                    aria-describedby="guard_nameHelp" 
+                                    :placeholder="$t('guard_name_placeholder')"
                                     v-model="state.editingRecord.guard_name"/>
-                                <div class="invalid-feedback" 
-                                    v-if="errors?.guard_name">{{ errors.guard_name[0] }}</div>
+                            <div class="invalid-feedback" 
+                                    v-if="errors?.name">{{ errors.guard_name[0] }}</div>
 
-                            </div>
                         </div>
 
                     </div>
-                    <div class="modal-footer">
-                        
+
+                    <div class="modal-footer" style="justify-content: space-between;">
                         <!-- CANCEL -->
                         <button type="button" 
                                 class="btn btn-secondary"
                                 @click="closeEditModal()">
                             {{ $t('cancel') }}
                         </button>
-                        
+                    
                         <!-- SAVE -->
                         <button type="submit" 
                                 @click="state.isEdit? updateRecord() : createRecord()"  
-                                class="btn btn-primary"
+                                class="btn btn-primary pull-left"
                         >{{ state.isEdit ? $t('update') : $t('create') }}</button>
+                
                     </div>
+
                 </div>
             </div>
         </div>
@@ -520,8 +565,42 @@
              :show="state.showSettingsModal">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <div class="modal-header"></div>
-                    <div class="modal-body"></div>
+                    
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">
+                            <span>{{ $t('settings') }}</span>
+                        </h5>
+                        <button type="button" class="close" 
+                                data-dismiss="modal" 
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="form-check" 
+                             v-for="(config, column) in state.columns" 
+                             :key="column">
+                            <input v-model="config.is_visible" 
+                                   class="form-check-input" 
+                                   type="checkbox" 
+                                   :id="column">
+                            <label class="form-check-label" 
+                                   :for="column">
+                                {{ $t(config.label) }}
+                            </label>
+                        </div>
+
+                        <!--<div v-for="(config, column) in state.columns" 
+                             :key="column">
+                            <input :id="column" type="checkbox"
+                                   class="form-check-input"
+                                   v-model="config.is_visible" />
+                            <label :for="column" 
+                                   class="form-check-label">{{ $t('config.label') }}</label>
+                        </div>-->
+                    </div>
                     <div class="modal-footer"></div>
                 </div>
             </div>

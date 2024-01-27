@@ -56,7 +56,7 @@
             <li class="nav-item">
                 <Link :href="route('roles')" 
                    class="nav-link">
-                    <i class="nav-icon fas fa-dirdle-user"></i>
+                    <i class="nav-icon fas fa-user-shield"></i>
                     <p>
                         {{ $t('roles') }}
                     </p>

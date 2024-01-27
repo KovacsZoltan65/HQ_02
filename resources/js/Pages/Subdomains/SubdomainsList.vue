@@ -232,7 +232,7 @@
     // Kijelölt rekordok törlése
     const bulkDelete = () => {
         //console.log('bulkDelete', selectedRecords.value);
-        axios.delete()
+        axios.delete(route(''), {})
         .then(resource => {
             state.Records = state.Records.filter(s => !selectedRecords.value.includes(s.id) );
             selectedRecords.value = [];

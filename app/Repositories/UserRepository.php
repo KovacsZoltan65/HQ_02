@@ -2,16 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Criteria\UserCriteria;
-use App\Interfaces\UserRepositoryInterface;
-use App\Models\User;
-
 /**
  * Class UserRepositoryRepositoryEloquent.
  *
  * @package namespace App\Repositories;
  */
-class UserRepository extends BaseRepository implements UserRepositoryInterface
+class UserRepository extends BaseRepository implements App\Interfaces\UserRepositoryInterface
 {
     /**
      * Specify Model class name
@@ -20,7 +16,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
      */
     public function model()
     {
-        return User::class;
+        return App\Models\User::class;
     }
 
     
@@ -30,7 +26,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
      */
     public function boot()
     {
-        $this->pushCriteria(UserCriteria::class);
+        $this->pushCriteria(App\Criteria\UserCriteria::class);
     }
     
 }

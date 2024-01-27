@@ -11,6 +11,7 @@
     "update": "Frissítés",
     "delete": "Törlés",
     "refresh": "Frissítés",
+    "settings": "Beállítások",
 
     "id": "#",
     "name": "Név",
@@ -24,6 +25,7 @@
     "confirm_password": "Jelszó megerősítés",
     "url": "URL",
     "url_placeholder": "URL",
+    "guard_name": "Őr neve",
     
     "db_host": "DB kiszolgáló",
     "db_host_placeholder": "db host",
@@ -56,13 +58,33 @@
     "subdomains": "Aldomainek",
     "subdomain": "Aldomain",
     "subdomains_card_text": "Aldomain-ek listája",
+    
     "subdomains_new": "Új aldomain",
+    "subdomains_created": "Az aldomain sikeresen elkészült",
+    
     "subdomains_edit": "Aldomain szerkesztése",
     "subdomains_updated": "Az aldomain sikeresen frissítve!",
+    
     "subdomains_delete": "Aldomain törlése",
     "subdomains_delete_confirmation": "Biztosan törli ezt az aldomaint?",
-    "subdomains_created": "Az aldomain sikeresen elkészült",
     "subdomains_deleted": "Az aldomain törlése sikeresen megtörtént!",
     "subdomains_bulk_deleted": "Az aldomain csoportos törlése sikeresen megtörtént!",
-    "subdomains_restore": "Az aldomain visszaállítása sikeresen megtörtént!"
+    
+    "subdomains_restore": "Az aldomain visszaállítása sikeresen megtörtént!",
+    
+    "roles": "Szerepkörök",
+    "role": "Szerepkör",
+    
+    "roles_new": "Új szerepkör",
+    "roles_created": "A szerepkör sikeresen elkészült",
+    
+    "roles_edit": "Szerepkör szerkesztése",
+    "roles_updated": "A szerepkör sikeresen frissítve!",
+    
+    "roles_delete": "Szerepkör törlése",
+    "roles_delete_confirmation": "Biztosan törli ezt a szerepkört?",
+    "roles_deleted": "A szerepkör törlése sikeresen megtörtént!",
+    "roles_bulk_deleted": "A szerepkör csoportos törlése sikeresen megtörtént!",
+    
+    "roles_restore": "A szerepkör visszaállítása sikeresen megtörtént!"
 }

@@ -2,15 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\RoleRepositoryInterface;
-use App\Models\Role;
-
 /**
  * Class RoleRepositoryEloquent.
  *
  * @package namespace App\Repositories;
  */
-class RoleRepository extends BaseRepository implements RoleRepositoryInterface
+class RoleRepository extends BaseRepository implements App\Interfaces\RoleRepositoryInterface
 {
     /**
      * Specify Model class name
@@ -19,7 +16,7 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
      */
     public function model()
     {
-        return Role::class;
+        return App\Models\Role::class;
     }
 
     

@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSubdomainRequest;
 use App\Http\Requests\UpdateSubdomainRequest;
+use App\Interfaces\SubdomainRepositoryInterface;
 use App\Models\Subdomain;
-use App\Repositories\SubdomainRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 
 class SubdomainController extends Controller
 {
     private $repository;
     
-    public function __construct(SubdomainRepository $repository) {
+    public function __construct(SubdomainRepositoryInterface $repository) {
         $this->repository = $repository;
         
         //$this->middleware('can:subdomain list', ['only' => ['index', 'show']]);
