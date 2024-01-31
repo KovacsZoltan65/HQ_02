@@ -30,16 +30,15 @@
                 </ul>
             </li>
         -->
-            <li class="nav-item">
+            <!--<li class="nav-item">
                 <Link :href="route('users')" 
                       class="nav-link">
                     <i class="nav-icon fas fa-users"></i>
                     <p>
                         {{ $t('users') }}
-                        <!--<span class="right badge badge-danger">New</span>-->
                     </p>
                 </Link>
-            </li>
+            </li>-->
 
             <!-- SUBDOMAINS -->
             <li class="nav-item">

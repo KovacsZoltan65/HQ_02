@@ -47,35 +47,7 @@ Route::middleware('auth')->group(function () {
 // ===============================
 // USERS
 // ===============================
-// felhasználók lekérése
-Route::get(
-    '/getUsers', 
-    [App\Http\Controllers\Admin\UsersController::class, 'getUsers']
-)->name('getUsers');
-// jelszó módosítás
-Route::post(
-    '/change_password/{user}', 
-    [App\Http\Controllers\Admin\UsersController::class, 'chengePassword']
-)->name('change_password');
-// Felhasználó csoportos törlése
-Route::delete(
-    '/users/bulkDelete', 
-    /*[App\Http\Controllers\Admin\UsersController::class, 'bulkDelete']*/
-    function(Illuminate\Http\Request $request){
-    dd($request->all());
-    }
-)->name('users.bulkDelete');
 
-Route::resource('/users', \App\Http\Controllers\Admin\UsersController::class
-)->names([
-      'index' => 'users',
-     'create' => 'users_create',
-      'store' => 'users_store',
-       'edit' => 'users_edit',
-     'update' => 'users_update',
-    'destroy' => 'users_destroy',
-    'restore' => 'users_restore',
-]);
 
 // ===============================
 // SUBDOMAINS
@@ -103,24 +75,9 @@ Route::resource('/subdomains', \App\Http\Controllers\SubdomainController::class)
 // ===============================
 // ROLES
 // ===============================
-Route::get(
-    '/getRoles', 
-    [\App\Http\Controllers\Admin\RoleController::class, 'getRoles']
-)->name('getRoles');
-
-Route::get('/getRoles2', [\App\Http\Controllers\Admin\RoleController::class, 'getRoles2'])->name('getRoles2');
-
-Route::delete('/roles/{role}/bulkDelete', [\App\Http\Controllers\Admin\RoleController::class, 'bulkDelete'])->name('roles_bulkDelete');
-Route::post('/roles/{role}/restore/', [\App\Http\Controllers\Admin\RoleController::class, 'restore'])->name('roles_restore');
-
+Route::get('/getRoles', [\App\Http\Controllers\Admin\RoleController::class, 'getRoles'])->name('getRoles');
 Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->names([
-      'index' => 'roles',
-     'create' => 'roles_create',
-      'store' => 'roles_store',
-       'view' => 'roles_view',
-       'edit' => 'roles_edit',
-     'update' => 'roles_update',
-    'destroy' => 'roles_destroy',
+    'index' => 'roles'
 ]);
 
 require __DIR__.'/auth.php';

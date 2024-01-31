@@ -2,10 +2,15 @@
     import { reactive, onMounted, ref } from 'vue';
     import axios from 'axios';
     import { Head, Link } from '@inertiajs/vue3';
+
     import MainLayout from '@/Layouts/MainLayout.vue';
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
+
     import { trans } from 'laravel-vue-i18n';
+
+    import { useToastr } from '@/toastr';
+    const toastr = useToastr();
 
     const props = defineProps({
         can: {
@@ -17,14 +22,6 @@
     const errors = ref({});
     const selectedRecords = ref([]);
     const selectAll = ref(false);
-
-    const newRecord = () => {
-        return {
-            id: 0,
-            name: 'role_01',
-            guard_name: 'web',
-        };
-    };
 
     const state = reactive({
         Records: [],
@@ -61,23 +58,37 @@
     // =====================
     // ÚJ REKORD
     // =====================
+    function newRecord() {
+        return {
+            id: 0,
+            name: 'role_01',
+            guard_name: 'web',
+        };
+    };
+    // Új rekord előkészítése
     const newRecord_init = () => {
         cancelEdit();
         state.isEdit = false;
 
         openEditModal();
     };
-    
+    // Új rekord mentése
     const createRecord = () => {
+        console.log('createRecord', state.Record);
         errors.value = '';
 
         axios.post(route('roles'), state.Record)
-        .then(resource => {})
-        .catch(error => { console.log('createRecord error', error); });
+        .then(resource => {
+            console.log(resource);
+            closeEditModal();
+        })
+        .catch(error => {
+            console.log(error);
+        });
     };
 
     // =====================
-    // REKORD SZERKESZTÉSE
+    // SZERKESZTÉS
     // =====================
     const editRecord = (record) => {
         state.editingRecord = record;
@@ -85,6 +96,7 @@
 
         openEditModal();
     };
+    // Szerkesztett adatok mentése
     const updateRecord = () => {
         errors.value = '';
 
@@ -95,63 +107,84 @@
         })
         .then(response => {
             cancelEdit();
-
             closeEditModal();
-        })
-        .catch(error => { console.log('updateRecord error', error); });
-    };
 
+            toastr.success(trans('roles_updated'));
+            //toastr.success('ASDASDAS');
+        })
+        .catch(error => {
+            console.log('error', error);
+            //errors.value = error.response.data.errors;
+        });
+    };
+    // Szerkesztés megszakítása
     const cancelEdit = () => {
-        state.edtRecord = newRecord();
+        state.editRecord = newRecord();
         state.isEdit = false;
     };
 
     // =====================
-    // REKORD TÖRLÉSE
+    // REKORD(OK) TÖRLÉSE
     // =====================
+    // Törlés megerősítése
     const confirmDelete = (record) => {
         state.deletingRecord = record;
-        
         openDeleteModal();
     };
-
+    // Rekord törlése
     const deleteRecord = () => {
         axios.delete(`/roles/${state.deletingRecord.id}`)
         .then(response => {
-            state.Records = state.Records.filter(item => item.id !== state.deletingRecord.id);
-
             closeDeleteModal();
-        })
-        .catch(error => { console.log('deleteRecord error', error); });
-    };
+            state.Records = state.Records.filter(record => record.id !== state.deletingRecord.id);
 
+            toastr.success(trans('roles_deleted'));
+        })
+        .catch(error => console.log(error));
+    };
+    // Kijelölt rekordok törlése
     const bulkDelete = () => {
-        axios.delete(
-            route('roles_bulkDelete', 
-                {data: {
-                    ids: selectedRecords.value
-                }}
-            )
-        ).then(response => {
-            state.Records = state.Records.filter(s => !selectedRecords.value.includes(s.id));
+        //console.log('bulkDelete', selectedRecords.value);
+        axios.delete(route('roles_bulkDelete', {data: {}}))
+        .then(resource => {
+            state.Records = state.Records.filter(s => !selectedRecords.value.includes(s.id) );
             selectedRecords.value = [];
             selectAll.value = false;
-
+            toastr.success(trans('roles_bulk_deleted'));
         })
         .catch(error => {
-            console.log('bulkDelete error', error);
+            //
         });
     };
-
+    // Törlés megszakítása
     const cancelDelete = () => {
         state.deletingRecord = newRecord();
         closeDeleteModal();
     };
 
     // =====================
+    // ADATLEKÉRÉS
+    // =====================
+    const getRecords = async (page = state.pagination.current_page) => {
+        axios.get(route('getRoles', {
+            filters: state.filter,
+            config: {
+                per_page: state.pagination.per_page,
+            }, page
+        })).then(response => {
+            state.Records = response.data.roles.data;
+            //console.log(state.Records);
+            selectedRecords.value = [];
+            selectAll.value = false;
+        }).catch(error => {
+            console.log('getRecords error', error);
+        });
+    };
+
+    // =====================
     // KIJELÖLÉS
     // =====================
-
+    // Összes rekord kijelölése
     const selectAllRecord = () => {
         if( selectAll.value ){
             selectedRecords.value = state.Records.map(record => record.id);
@@ -159,36 +192,20 @@
             selectedRecords.value = [];
         }
     };
-
+    // Rekord jelölés váltása
     const toggleSelection = (id) => {
+
         const index = selectedRecords.value.indexOf(id);
 
-        if( index === -1 ){
+        if( index === -1 ) {
             selectedRecords.value.push(id);
-        }else{
+        } else {
             selectedRecords.value.splice(index, 1);
         }
-    };
-    
-    
-    // =====================
-    // ADATLEKÉRÉS
-    // =====================
-    const getRecords = async (page = state.pagination.current_page) => {
-        axios.get(route('getRoles'), {
-            filters: state.filter, 
-            config: {
-                per_page: state.pagination.per_page
-            }
-        }, page)
-        .then(response => {
-            state.Records = response.data.roles.data;
-            selectedRecords.value = [];
-            selectAll.value = false;
-        })
-        .catch(error => {
-            console.log('getRecords error', error);
-        });
+        //console.log('state.Records.length', state.Records.length);
+        //console.log('selectedRecords.value.length', selectedRecords.value.length);
+        //console.log( (state.Records.length === selectedRecords.value.length) );
+        //selectAll.value = (state.Records.length === selectedRecords.value.length);
     };
 
     onMounted(() => {
@@ -198,22 +215,34 @@
     // =====================
     // MODAL KEZELÉS
     // =====================
-    const openSettingsModal = () => { $('#settingsModal').modal('show'); };
-    const closeSettingsModal = () => { $('#settingsModal').modal('hide'); };
-
-    const openEditModal = () => { $('#editModal').modal('show'); };
-    const closeEditModal = () => {
+    // beállítások
+    function openSettingsModal() {
+        $('#settingsModal').modal('show');
+    };
+    function closeSettingsModal() {
+        $('#settingsModal').modal('hide');
+    };
+    // szerkesztés
+    function openEditModal() {
+        $('#editModal').modal('show');
+    };
+    function closeEditModal() {
         cancelEdit();
+
         $('#editModal').modal('hide');
     };
-
-    const openDeleteModal = () => { $('#deleteModal').modal('show'); };
-    const closeDeleteModal = () => { $('#deleteModal').modal('hide'); };
-
+    // törlés
+    function openDeleteModal() {
+        $('#deleteModal').modal('show');
+    };
+    function closeDeleteModal() {
+        $('#deleteModal').modal('hide');
+    };
 </script>
 
 <template>
     <Head :title="$t('roles')"/>
+
     <MainLayout>
         <!-- CONTENT HEADER -->
         <div class="content-header">
@@ -241,6 +270,7 @@
         <!-- CONTENT -->
         <div class="content">
             <div class="container-fluid">
+
                 <div class="d-flex justify-content-between">
                     <div class="d-flex">
                         <div class="bd-example">
@@ -248,10 +278,10 @@
                             <!-- ADD NEW RECORD -->
                             <button type="button"
                                     class="btn btn-primary"
-                                    :title="$t('roles_new')"
+                                    :title="$t('subdomains_new')"
                                     @click="newRecord_init()">
                                 <i class="fa fa-plus-circle mr-1"></i>
-                                {{ $t('roles_new') }}
+                                {{ $t('subdomains_new') }}
                             </button>
 
                             <!-- REFRESH -->
@@ -276,9 +306,10 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-12">
-                        <div class="card">
+                    <div class="col-lg-12">
 
+                        <div class="card">
+                            
                             <div class="card-header">
                                 <h5 class="card-title">{{ $t('roles') }}</h5>
                                 <div class="card-tools">
@@ -298,43 +329,37 @@
                             </div>
 
                             <div class="card-body">
-                                <!-- TÁBLA -->
+                                <!-- TÁBLÁZAT -->
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <!-- checkbox a fejlécben -->
                                             <th>
+                                                <!-- checkbox a fejlécben -->
                                                 <input type="checkbox" 
                                                        v-model="selectAll"
                                                        @change="selectAllRecord()"/>
                                             </th>
-                                            
-                                            <!-- HEAD -->
-                                            <th v-for="(key, value) in state.columns" 
-                                                :key="key">
+
+                                            <th v-for="(key, value) in state.columns">
                                                 {{ $t(value) }}
                                             </th>
 
-                                            <!-- ACTIONS -->
                                             <th>{{ $t('actions') }}</th>
-
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="Record in state.Records" 
-                                            :key="Record.id">
-                                            <!-- checkbox a sor elején -->
+                                        <tr v-for="Record in state.Records">
                                             <td>
+                                                <!-- checkbox a sor elején -->
                                                 <input type="checkbox" 
                                                        :checked="selectAll"
                                                        @change="toggleSelection(Record.id)"/>
                                             </td>
-
-                                            <!-- FIELDS -->
-                                            <td v-for="(key, value) in state.columns" 
-                                                :key="key">{{ Record[value] }}</td>
                                             
-                                            <!-- ACTIONS -->
+                                            <td v-for="(key, value) in state.columns">
+                                                {{ Record[value] }}
+                                            </td>
+                                            
                                             <td>
                                                 <div class="bd-example">
                                                     <button type="button" 
@@ -353,7 +378,9 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <!-- /táblázat -->
 
+                            <!-- footer -->
                             <div class="card-footer">
                                 <v-pagination v-model="state.pagination.current_page" 
                                               :pages="state.pagination.total_number_of_pages"
@@ -361,20 +388,23 @@
                                               active-color="#DCEDFF"
                                               @update:modelValue="getRecords"/>
                             </div>
+                            <!-- /footer -->
                         </div>
+                        <!-- /card -->
                     </div>
                 </div>
 
             </div>
+
         </div>
 
-        <!-- edit modal -->
+        <!-- EDIT MODAL -->
         <div class="modal fade" id="editModal" 
              data-backdrop="static" 
              tabindex="-1" role="dialog" 
              aria-labelledby="staticBackdropLabel" 
              aria-hidden="true"
-             >
+             :show="state.showEditModal">
             <div class="modal-dialog modal-dialog-scrollable modal-lg" 
                  role="document">
                 <div class="modal-content">
@@ -442,7 +472,7 @@
             </div>
         </div>
 
-        <!-- delete modal -->
+        <!-- DELETE MODAL -->
         <div class="modal fade" id="deleteModal" 
              data-backdrop="static" 
              tabindex="-1" role="dialog" 
@@ -454,7 +484,7 @@
 
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">
-                            <span>{{ $t('roles_delete') }}</span>
+                            <span>{{ $t('subdomains_delete') }}</span>
                         </h5>
                         <button type="button" class="close" 
                                 data-dismiss="modal" 
@@ -464,7 +494,7 @@
                     </div>
 
                     <div class="modal-body">
-                        <h5>{{ $t('roles_delete_confirmation') }}</h5>
+                        <h5>{{ $t('subdomains_delete_confirmation') }}</h5>
                     </div>
                     
                     <div class="modal-footer">
@@ -481,7 +511,7 @@
             </div>
         </div>
 
-        <!-- settings modal -->
+        <!-- SETTINGS MODAL -->
         <div class="modal fade" id="settingsModal" 
              data-backdrop="static" 
              tabindex="-1" role="dialog" 
