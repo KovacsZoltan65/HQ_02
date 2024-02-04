@@ -4,6 +4,8 @@
     "startpage": "Induló oldal",
 
     "delete_selected": "Kijelöltek törlése",
+    "deletion_aborted": "Törlés megszakítva",
+    "delete_confirmation": "Törlés megerősítése",
 
     "search": "Keresés...",
     "cancel": "Mégsem",
@@ -12,6 +14,9 @@
     "delete": "Törlés",
     "refresh": "Frissítés",
     "settings": "Beállítások",
+    "back": "Vissza",
+    "yes": "Igen",
+    "no": "Nem",
 
     "id": "#",
     "name": "Név",
@@ -66,7 +71,7 @@
     "subdomains_updated": "Az aldomain sikeresen frissítve!",
     
     "subdomains_delete": "Aldomain törlése",
-    "subdomains_delete_confirmation": "Biztosan törli ezt az aldomaint?",
+    "subdomains_delete_confirmation": "Biztosan törli a(z) :name aldomaint?",
     "subdomains_deleted": "Az aldomain törlése sikeresen megtörtént!",
     "subdomains_bulk_deleted": "Az aldomain csoportos törlése sikeresen megtörtént!",
     
@@ -82,7 +87,7 @@
     "roles_updated": "A szerepkör sikeresen frissítve!",
     
     "roles_delete": "Szerepkör törlése",
-    "roles_delete_confirmation": "Biztosan törli ezt a szerepkört?",
+    "roles_delete_confirmation": "Biztosan törli a(z) :name szerepkört?",
     "roles_deleted": "A szerepkör törlése sikeresen megtörtént!",
     "roles_bulk_deleted": "A szerepkör csoportos törlése sikeresen megtörtént!",
     

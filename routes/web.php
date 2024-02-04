@@ -77,7 +77,14 @@ Route::resource('/subdomains', \App\Http\Controllers\SubdomainController::class)
 // ===============================
 Route::get('/getRoles', [\App\Http\Controllers\Admin\RoleController::class, 'getRoles'])->name('getRoles');
 Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->names([
-    'index' => 'roles'
+      'index' => 'roles',
+     'create' => 'roles_create',
+      'store' => 'roles_store',
+       'view' => 'roles_view',
+       'edit' => 'roles_edit',
+     'update' => 'roles_update',
+    'destroy' => 'roles_destroy',
+    'restore' => 'roles_restore',
 ]);
 
 require __DIR__.'/auth.php';

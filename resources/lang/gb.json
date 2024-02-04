@@ -4,6 +4,8 @@
     "startpage": "Starter Page",
 
     "delete_selected": "Delete Selected",
+    "deletion_aborted": "Deletion Aborted",
+    "delete_confirmation": "Confirm Deletion",
 
     "search": "Search...",
     "cancel": "Cancel",
@@ -12,6 +14,9 @@
     "delete": "Delete",
     "refresh": "Refresh",
     "settings": "Settings",
+    "back": "Back",
+    "yes": "Yes",
+    "no": "No",
 
     "id": "#",
     "name": "Name",
@@ -82,7 +87,7 @@
     "roles_updated": "The role has been successfully updated!",
     
     "roles_delete": "Delete Role",
-    "roles_delete_confirmation": "Are you sure you want to delete this role ?",
+    "roles_delete_confirmation": "Are you sure you want to delete :name role ?",
     "roles_deleted": "The role has been successfully deleted!",
     "roles_bulk_deleted": "The group deletion of the role has been successfully completed!",
     

@@ -1,11 +1,15 @@
 <script setup>
-    import { reactive, onMounted, ref } from 'vue';
+    import { reactive, onMounted, ref, watch } from 'vue';
     import axios from 'axios';
     import { Head, Link } from '@inertiajs/vue3';
     import MainLayout from '@/Layouts/MainLayout.vue';
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
     import { trans } from 'laravel-vue-i18n';
+    import Swal from 'sweetalert2';
+    import 'sweetalert2/dist/sweetalert2.min.css';
+
+    const local_storage_column_key = 'ln_roles_grid_columns';
 
     const props = defineProps({
         can: {
@@ -17,6 +21,20 @@
     const errors = ref({});
     const selectedRecords = ref([]);
     const selectAll = ref(false);
+
+    // Általános alert
+    const alerta = Swal.mixin({
+        buttonsStyling: true
+    });
+
+    // Törlés alert
+    const delete_alert = Swal.mixin({
+        buttonsStyling: true,
+        title: trans('delete_confirmation'),
+        icon: 'question',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+    });
 
     const newRecord = () => {
         return {
@@ -58,6 +76,10 @@
         },
     });
 
+    watch(state.columns, (new_value, old_value) => {
+        localStorage.setItem(local_storage_column_key, JSON.stringify(new_value));
+    });
+
     // =====================
     // ÚJ REKORD
     // =====================
@@ -72,8 +94,15 @@
         errors.value = '';
 
         axios.post(route('roles'), state.Record)
-        .then(resource => {})
-        .catch(error => { console.log('createRecord error', error); });
+        .then(resource => {
+            //console.log('createRecord', resource);
+            state.Records.push(resource.data.role);
+
+            alerta.fire(trans('roles_created'), '', 'info');
+        })
+        .catch(error => {
+            console.log('createRecord error', error); 
+        });
     };
 
     // =====================
@@ -81,6 +110,7 @@
     // =====================
     const editRecord = (record) => {
         state.editingRecord = record;
+        //console.log('state.editingRecord', state.editingRecord);
         state.isEdit = true;
 
         openEditModal();
@@ -94,35 +124,64 @@
             guard_name: state.editingRecord.guard_name,
         })
         .then(response => {
+            for(let i = 0; i < state.Records.length; i++){
+                if( state.Records[i].id == state.editingRecord.id ){
+                    state.Records[i] = response.data;
+                }
+            }
+
             cancelEdit();
 
             closeEditModal();
+
+            alerta.fire(trans('roles_updated'), '', 'info');
         })
         .catch(error => { console.log('updateRecord error', error); });
     };
 
     const cancelEdit = () => {
-        state.edtRecord = newRecord();
+        state.editingRecord = newRecord();
         state.isEdit = false;
     };
 
     // =====================
     // REKORD TÖRLÉSE
     // =====================
+    // törlés előkészítése
     const confirmDelete = (record) => {
+        /*
         state.deletingRecord = record;
         
         openDeleteModal();
+        */
+        delete_alert.fire({
+            text: trans('roles_delete_confirmation', {name: record.name}),
+            confirmButtonText: trans('yes'),
+            showDenyButton: false,
+            denyButtonText: trans('deny'),
+            showCancelButton: true,
+            cancelButtonText: trans('cancel'),
+        }).then(result => {
+            //
+            if( result.isConfirmed ){
+                state.deletingRecord = record;
+                deleteRecord();
+            }else if( result.isDenied ){
+                state.deletingRecord = newRecord();
+                alerta.fire(trans('deletion_aborted'), '', 'info');
+            }
+        });
     };
 
+    // rekord törlése
     const deleteRecord = () => {
         axios.delete(`/roles/${state.deletingRecord.id}`)
         .then(response => {
             state.Records = state.Records.filter(item => item.id !== state.deletingRecord.id);
-
-            closeDeleteModal();
         })
-        .catch(error => { console.log('deleteRecord error', error); });
+        .catch(error => {
+            console.log('deleteRecord error', error);
+        });
     };
 
     const bulkDelete = () => {
@@ -191,9 +250,20 @@
         });
     };
 
-    onMounted(() => {
+    onMounted(async () => {
+        
+        let columns = localStorage.getItem(local_storage_column_key);
+        if( columns ){
+            columns = JSON.parse(columns);
+            for(const column_name in columns){
+                state.columns[column_name] = columns[column_name];
+            }
+        }
+
         getRecords();
     });
+
+    const settings_init = () => { openSettingsModal(); };
 
     // =====================
     // MODAL KEZELÉS
@@ -234,6 +304,7 @@
                             <li class="breadcrumb-item active">{{ $t('roles') }}</li>
                         </ol>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -241,6 +312,7 @@
         <!-- CONTENT -->
         <div class="content">
             <div class="container-fluid">
+
                 <div class="d-flex justify-content-between">
                     <div class="d-flex">
                         <div class="bd-example">
@@ -262,6 +334,11 @@
                                 <i class="fas fa-sync"></i>
                             </button>
 
+                            <!-- SETTUNGS -->
+                            <button typw="button" 
+                                    class="btn btn-primary" @click="settings_init()"
+                            >{{ $t('settings') }}</button>
+
                             <!-- BULK DELETE -->
                             <div v-if="selectedRecords.length > 0">
                                 <button type="button"
@@ -281,6 +358,7 @@
 
                             <div class="card-header">
                                 <h5 class="card-title">{{ $t('roles') }}</h5>
+
                                 <div class="card-tools">
                                     <!-- KERESÉS -->
                                     <div class="input-group input-group-sm">
@@ -311,7 +389,8 @@
                                             
                                             <!-- HEAD -->
                                             <th v-for="(key, value) in state.columns" 
-                                                :key="key">
+                                                :key="key" 
+                                                v-show="key.is_visible">
                                                 {{ $t(value) }}
                                             </th>
 
@@ -332,7 +411,8 @@
 
                                             <!-- FIELDS -->
                                             <td v-for="(key, value) in state.columns" 
-                                                :key="key">{{ Record[value] }}</td>
+                                                :key="key" 
+                                                v-show="key.is_visible">{{ Record[value] }}</td>
                                             
                                             <!-- ACTIONS -->
                                             <td>
@@ -490,9 +570,26 @@
              :show="state.showSettingsModal">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <div class="modal-header"></div>
-                    <div class="modal-body"></div>
-                    <div class="modal-footer"></div>
+                    
+                    <div class="modal-header">{{ $t('settings') }}</div>
+
+                    <div class="modal-body">
+                        <div v-for="(config, column) in state.columns" 
+                             :key="column" 
+                             class="form-check">
+                            <input v-model="config.is_visible" 
+                                   class="form-check-input" 
+                                   type="checkbox">
+                            <label class="form-check-label">{{ $t(config.label) }}</label>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" 
+                                class="btn btn-primary" 
+                                @click="closeSettingsModal()"
+                        >{{ $t('back') }}</button>
+                    </div>
                 </div>
             </div>
         </div>
