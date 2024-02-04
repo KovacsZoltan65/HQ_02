@@ -91,5 +91,21 @@
     "roles_deleted": "The role has been successfully deleted!",
     "roles_bulk_deleted": "The group deletion of the role has been successfully completed!",
     
-    "roles_restore": "The role has been restored successfully!"
+    "roles_restore": "The role has been restored successfully!",
+    
+    "permissions": "Permissions",
+    "permission": "Permission",
+    
+    "permissions_new": "New Permission",
+    "permissions_created": "The permission has been created successfully",
+    
+    "permissions_edit": "Edit Permission",
+    "permissions_updated": "The permission has been successfully updated!",
+    
+    "permissions_delete": "Delete Permission",
+    "permissions_delete_confirmation": "Are you sure you want to delete :name permission ?",
+    "permissions_deleted": "The permission has been successfully deleted!",
+    "permissions_bulk_deleted": "The group deletion of the permission has been successfully completed!",
+    
+    "permissions_restore": "The permission has been restored successfully!"
 }

@@ -9,6 +9,8 @@ class Permission extends OriginalPermission
 {
     use HasFactory;
 
+    protected $table = 'permissions';
+    
     protected $fillable = [
         'name',
         'guard_name',

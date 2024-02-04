@@ -3,38 +3,38 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreRoleRequest;
-use App\Http\Requests\UpdateRoleRequest;
-use App\Interfaces\RoleRepositoryInterface;
-use App\Models\Role;
+use App\Http\Requests\StorePermissionRequest;
+use App\Http\Requests\UpdatePermissionRequest;
+use App\Interfaces\PermissionRepositoryInterface;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
 
-class RoleController extends Controller
+class PermissionController extends Controller
 {
     private $repository;
     
-    public function __construct(RoleRepositoryInterface $repository)
-    {
+    public function __construct(PermissionRepositoryInterface $repository) {
         $this->repository = $repository;
         
-        //$this->middleware('can:role list', ['only' => ['index', 'show']]);
-        //$this->middleware('can:role create', ['only' => ['create', 'store']]);
-        //$this->middleware('can:role edit', ['only' => ['edit', 'update']]);
-        //$this->middleware('can:role delete', ['only' => ['destroy', 'bulkDelete']]);
+        //$this->middleware('can:permission list', ['only' => ['index', 'show']]);
+        //$this->middleware('can:permission create', ['only' => ['create', 'store']]);
+        //$this->middleware('can:permission edit', ['only' => ['edit', 'update']]);
+        //$this->middleware('can:permission delete', ['only' => ['destroy', 'bulkDelete']]);
     }
+    
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        return Inertia::render('Roles/RolesList', [
+        return Inertia::render('Permissions/PermissionsList', [
             'can' => $this->_getRoles(),
         ]);
     }
     
-    public function getRoles(Request $request)
+    public function getPermissions(Request $request)
     {
         //
         $config = $request->get('config', []);
@@ -62,10 +62,10 @@ class RoleController extends Controller
             ? $config['per_page'] 
             : config('app.per_page');
         
-        $roles = Role::query()->paginate($per_page);
+        $permissions = Permission::query()->paginate($per_page);
         
         $data = [
-            'roles' => $roles,
+            'permissions' => $permissions,
             'config' => $config,
             'filters' => $filters,
         ];
@@ -78,23 +78,22 @@ class RoleController extends Controller
      */
     public function create(Request $request)
     {
-        $role = new Role();
+        $permission = new Permission();
         
-        return Inertia::render('Roles/RolesCreate', [
+        return Inertia::render('Permissions/PermissionsCreate', [
             'can' => $this->_getRoles(),
-            'role' => $role,
+            'permission' => $permission,
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRoleRequest $request)
+    public function store(StorePermissionRequest $request)
     {
-        //dd('RoleController@store $request', $request->all());
-        $role = $this->repository->create($request->all());
+        $permission = $this->repository->create($request->all());
         
-        return redirect()->back()->with('message', __('roles_created'));
+        return redirect()->back()->with('message', __('permissions_created'));
     }
 
     /**
@@ -108,7 +107,7 @@ class RoleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Role $role)
+    public function edit(Permission $permission)
     {
         //
     }
@@ -116,10 +115,9 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRoleRequest $request, $id)
+    public function update(UpdatePermissionRequest $request, $id)
     {
-        //dd('RoleController@update $request', $request->all(), $id);
-        $role = $this->repository->update($request->all(), $id);
+        $permission = $this->repository->update($request->all(), $id);
         
         return response()->json($role, Response::HTTP_OK);
     }
@@ -127,37 +125,34 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Role $role)
+    public function destroy(Permission $permission)
     {
-        //dd('RoleController@destroy', $role);
-        $this->repository->delete($role->id);
+        $this->repository->delete($permission->id);
         
-        return redirect()->back()->with('message', __('roles_deleted'));
+        return redirect()->back()->with('message', __('permissions_deleted'));
     }
     
     public function bulkDelete()
     {
-        //dd('RoleController@bulkDelete', $request->all());
-        Role::whereIn('id', request('ids'))->delete();
+        Permission::whereIn('id', request('ids'))->delete();
 
-        return redirect()->back()->with('message', __('roles_bulk_updated'));
+        return redirect()->back()->with('message', __('permissions_bulk_updated'));
     }
     
     public function restore($id)
     {
-        //dd('RoleController@restore', $id);
-        $role = Role::onlyTrashed()->find($id);
-        $role->restore();
+        $permissions = Permission::onlyTrashed()->find($id);
+        $permissions->restore();
         
-        return redirect()->back()->with('message', __('roles_restored'));
+        return redirect()->back()->with('message', __('permissions_restored'));
     }
     
     public function _getRoles(){
         return [
-            //'list' => Auth::user()->can('role list'),
-            //'create' => Auth::user()->can('role create'),
-            //'edit' => Auth::user()->can('role edit'),
-            //'delete' => Auth::user()->can('role delete'),
+            //'list' => Auth::user()->can('permission list'),
+            //'create' => Auth::user()->can('permission create'),
+            //'edit' => Auth::user()->can('permission edit'),
+            //'delete' => Auth::user()->can('permission delete'),
         ];
     }
 }

@@ -91,5 +91,21 @@
     "roles_deleted": "A szerepkör törlése sikeresen megtörtént!",
     "roles_bulk_deleted": "A szerepkör csoportos törlése sikeresen megtörtént!",
     
-    "roles_restore": "A szerepkör visszaállítása sikeresen megtörtént!"
+    "roles_restore": "A szerepkör visszaállítása sikeresen megtörtént!",
+    
+    "permissions": "Engedélyek",
+    "permission": "Engedély",
+    
+    "permissions_new": "Új engedély",
+    "permissions_created": "Az engedély sikeresen elkészült",
+    
+    "permissions_edit": "Engedély szerkesztése",
+    "permissions_updated": "Az engedély sikeresen frissítve!",
+    
+    "permissions_delete": "Engedély törlése",
+    "permissions_delete_confirmation": "Biztosan törli a(z) :name engedélyt?",
+    "permissions_deleted": "Az engedély törlése sikeresen megtörtént!",
+    "permissions_bulk_deleted": "Az engedély csoportos törlése sikeresen megtörtént!",
+    
+    "permissions_restore": "Az engedély visszaállítása sikeresen megtörtént!"
 }

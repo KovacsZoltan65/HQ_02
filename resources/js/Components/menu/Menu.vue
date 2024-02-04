@@ -62,6 +62,17 @@
                 </Link>
             </li>
 
+            <!-- PERMISSIONS -->
+            <li class="nav-item">
+                <Link :href="route('permissions')" 
+                   class="nav-link">
+                    <i class="nav-icon fas fa-user-shield"></i>
+                    <p>
+                        {{ $t('permissions') }}
+                    </p>
+                </Link>
+            </li>
+
             <!--<li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="nav-icon fas fa-th"></i>

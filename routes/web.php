@@ -76,6 +76,8 @@ Route::resource('/subdomains', \App\Http\Controllers\SubdomainController::class)
 // ROLES
 // ===============================
 Route::get('/getRoles', [\App\Http\Controllers\Admin\RoleController::class, 'getRoles'])->name('getRoles');
+Route::delete('/roles/{role}/bulkDelete', [\App\Http\Controllers\RoleController::class, 'bulkDelete'])->name('roles_bulkDelete');
+
 Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->names([
       'index' => 'roles',
      'create' => 'roles_create',
@@ -85,6 +87,23 @@ Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->na
      'update' => 'roles_update',
     'destroy' => 'roles_destroy',
     'restore' => 'roles_restore',
+]);
+
+// ===============================
+// PERMISSIONS
+// ===============================
+Route::get('/getPermissions', [\App\Http\Controllers\Admin\PermissionController::class, 'getPermissions'])->name('getPermissions');
+Route::delete('/permissions/{permission}/bulkDelete', [\App\Http\Controllers\PermissionController::class, 'bulkDelete'])->name('permissions_bulkDelete');
+
+Route::resource('/permissions', \App\Http\Controllers\Admin\PermissionController::class)->names([
+      'index' => 'permissions',
+     'create' => 'permissions_create',
+      'store' => 'permissions_store',
+       'view' => 'permissions_view',
+       'edit' => 'permissions_edit',
+     'update' => 'permissions_update',
+    'destroy' => 'permissions_destroy',
+    'restore' => 'permissions_restore',
 ]);
 
 require __DIR__.'/auth.php';

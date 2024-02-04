@@ -115,6 +115,18 @@ php artisan make:migration CreateSubdomainTable
 php artisan make:seeder SubdomainSeeder
 php artisan make:factory SubdomainFactory
 
+======================
+= ROLES
+======================
+php artisan make:model Role
+php artisan make:controller Admin\RoleController --resource
+php artisan make:request CreateRoleRequest
+php artisan make:request UpdateRoleRequest
+php artisan make:repository Role
+php artisan make:criteria Role
+php artisan make:migration CreateRoleTable
+php artisan make:seeder RoleSeeder
+php artisan make:factory RoleFactory
 
 ======================
 = PERMISSIONS
@@ -124,7 +136,7 @@ php artisan make:controller PermissionController --resource
 php artisan make:request CreatePermissionRequest
 php artisan make:request UpdatePermissionRequest
 php artisan make:repository Permission
-php artisan make:criteria PermissionCriteria
+php artisan make:criteria Permission
 php artisan make:migration CreatePermissionTable
 php artisan make:seeder PermissionSeeder
 php artisan make:factory PermissionFactory
