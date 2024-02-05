@@ -234,16 +234,19 @@
     // ADATLEKÉRÉS
     // =====================
     const getRecords = async (page = state.pagination.current_page) => {
-        axios.get(route('getPermissions'), {
+        axios.get(route('getPermissions', {
             filters: state.filter, 
             config: {
                 per_page: state.pagination.per_page
-            }
-        }, page)
+            }, page
+        }))
         .then(response => {
             state.Records = response.data.permissions.data;
             selectedRecords.value = [];
             selectAll.value = false;
+
+            state.pagination.current_page = response.data.permissions.current_page;
+            state.pagination.total_number_of_pages = response.data.permissions.last_page;
         })
         .catch(error => {
             console.log('getRecords error', error);

@@ -38,6 +38,7 @@ class PermissionController extends Controller
     {
         //
         $config = $request->get('config', []);
+\Log::info('$config: ' . print_r($config, true));
         //
         $filters = $request->get('filters', []);
         

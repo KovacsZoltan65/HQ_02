@@ -260,9 +260,11 @@
             }, page
         })).then(response => {
             state.Records = response.data.subdomains.data;
-            //console.log(state.Records);
             selectedRecords.value = [];
             selectAll.value = false;
+
+            state.pagination.total_number_of_pages = response.data.subdomains.last;
+            state.pagination.current_page = response.data.subdomains.current_page;
         }).catch(error => {
             console.log('getRecords error', error);
         });
