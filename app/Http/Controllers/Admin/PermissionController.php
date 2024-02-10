@@ -38,7 +38,6 @@ class PermissionController extends Controller
     {
         //
         $config = $request->get('config', []);
-\Log::info('$config: ' . print_r($config, true));
         //
         $filters = $request->get('filters', []);
         
@@ -72,6 +71,10 @@ class PermissionController extends Controller
         ];
         
         return response()->json($data, Response::HTTP_OK);
+    }
+    
+    public function getPermissionsToSelect(){
+        return \App\Http\Resources\PermissionResource::collection(Permission::all());
     }
 
     /**

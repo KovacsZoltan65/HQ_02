@@ -83,6 +83,13 @@ https://lokalise.com/blog/laravel-localization-step-by-step/
 https://stackoverflow.com/questions/72083968/replace-color-adjust-to-print-color-adjust-the-color-adjust-shorthand-is-curren
 https://stackoverflow.com/questions/72511039/autoprefixer-replace-color-adjust-to-print-color-adjust-the-color-adjust-short
 
+======================
+= TOKENFIELD
+======================
+https://www.npmjs.com/package/tokenfield/v/1.5.2
+https://kanecohen.github.io/tokenfield/
+https://sliptree.github.io/bootstrap-tokenfield/#events
+
 php artisan make:notification UserNotification
 php artisan notification:table
 

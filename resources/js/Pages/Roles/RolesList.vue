@@ -6,13 +6,37 @@
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
     import { trans } from 'laravel-vue-i18n';
+
     import Swal from 'sweetalert2';
     import 'sweetalert2/dist/sweetalert2.min.css';
+
+    import * as perm from '../../services/permissions';
+    //const { permissions, getPermissions, getPermissionsToSelect } = usePermissions();
+
+    // =============================
+    // = SELECT2
+    // =============================
+    import Select2 from 'vue3-select2-component';
+    
+    const myValue = '';
+    
+    const myOptions = [
+        {id: 1, text: 'value 01'}, 
+        {id: 2, text: 'value 02'}, 
+        {id: 3, text: 'value 03'}
+    ];
+    const myChangeEvent = (val) => { console.log('myChangeEvent', val); };
+    const mySelectEvent = ({id, text}) => { console.log('mySelectEvent', {id, text}); };
+    // =============================
 
     const local_storage_column_key = 'ln_roles_grid_columns';
 
     const props = defineProps({
         can: {
+            type: Object,
+            default: () => ({})
+        },
+        permissions: {
             type: Object,
             default: () => ({})
         }
@@ -41,6 +65,7 @@
             id: 0,
             name: 'role_01',
             guard_name: 'web',
+            permissions: []
         };
     };
 
@@ -109,6 +134,9 @@
     // REKORD SZERKESZTÉSE
     // =====================
     const editRecord = (record) => {
+
+        //console.log('record', record);
+
         state.editingRecord = record;
         //console.log('state.editingRecord', state.editingRecord);
         state.isEdit = true;
@@ -125,9 +153,10 @@
         })
         .then(response => {
             for(let i = 0; i < state.Records.length; i++){
-                if( state.Records[i].id == state.editingRecord.id ){
-                    state.Records[i] = response.data;
-                }
+                console.log(state.Records[i]);
+                //if( state.Records[i].id == state.editingRecord.id ){
+                //    state.Records[i] = response.data;
+                //}
             }
 
             cancelEdit();
@@ -241,7 +270,11 @@
             }, page
         }))
         .then(response => {
+            //console.log(response.data.roles.data);
+
             state.Records = response.data.roles.data;
+            //console.log(state.Records);
+
             selectedRecords.value = [];
             selectAll.value = false;
 
@@ -254,7 +287,7 @@
     };
 
     onMounted(async () => {
-        
+
         let columns = localStorage.getItem(local_storage_column_key);
         if( columns ){
             columns = JSON.parse(columns);
@@ -262,6 +295,8 @@
                 state.columns[column_name] = columns[column_name];
             }
         }
+        
+        //getPermissions();
 
         getRecords();
     });
@@ -286,7 +321,9 @@
 </script>
 
 <template>
+    
     <Head :title="$t('roles')"/>
+
     <MainLayout>
         <!-- CONTENT HEADER -->
         <div class="content-header">
@@ -503,6 +540,30 @@
                                     v-if="errors?.guard_name">{{ errors.guard_name[0] }}</div>
 
                             </div>
+
+                            <!-- PERMISSIONS -->
+                            <div class="form-group">
+                                <label>{{ $t('permissions') }}</label>
+                                <Select2 id="permissions" name="permissions" 
+                                         :options="myOptions"
+                                         :settings="{
+                                            width: '100%',
+                                            multiple: true,
+                                         }"
+                                ></Select2>
+                                <!--
+                                <Select2 class="form-control" 
+                                         v-model="myValue" 
+                                         :options="myOptions" 
+                                         :settings="{
+                                            settingOption: value, 
+                                            settingOption: value }" 
+                                            @change="myChangeEvent($event)" 
+                                            @select="mySelectEvent($event)" />
+                                <h4>Value: {{ myValue }}</h4>
+                                -->
+                            </div>
+
                         </div>
 
                     </div>

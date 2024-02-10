@@ -29,8 +29,12 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
+        $permissions = \App\Models\Permission::select('id', 'name')
+            ->get()->toArray();
+        //dd($permissions);
         return Inertia::render('Roles/RolesList', [
             'can' => $this->_getRoles(),
+            'permissions' => $permissions,
         ]);
     }
     
@@ -64,12 +68,20 @@ class RoleController extends Controller
         
         $roles = Role::query()->paginate($per_page);
         
+        foreach( $roles as $role ){
+            $rolePermissions = \App\Models\Permission::join("role_has_permissions", "role_has_permissions.permission_id", "=", "permissions.id")
+                ->where("role_has_permissions.role_id", $role->id)
+                ->select('id', 'name')
+                ->get()->toArray();
+            $role->permissions = $rolePermissions;
+        }
+        
         $data = [
             'roles' => $roles,
             'config' => $config,
             'filters' => $filters,
         ];
-        
+        \Log::info( print_r($data, true) );
         return response()->json($data, Response::HTTP_OK);
     }
 
