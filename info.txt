@@ -67,6 +67,12 @@ npm install -S yup
 https://fontawesome.com/search?q=trash&o=r&m=free&s=solid&f=sharp%2Cclassic
 
 ======================
+= PROGRESS
+======================
+https://inertiajs.com/progress-indicators
+npm install @inertiajs/progress
+
+======================
 = HELPER
 ======================
 composer require browner12/helpers

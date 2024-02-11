@@ -1,23 +1,28 @@
 import { ref } from "vue";
+import axios from "axios";
 
 export default function usePermissions(){
 
     const permissions = ref({});
-
-    //const getPermissionsToSelect = async () => {
-    //    axios.get('/api/get_permissions_to_select')
-    //    .then(response => {
-    //        categories.value = response.data.data;
-    //    });
-    //};
+    const permissionsToSelect = ref({});
 
     const getPermissions = async () => {
-        axios.get('/api/permissions')
-        .then(response => {
-            console.log('getPermissions', response);
-            permissions.value = response.data.data;
-        });
-    }
+        //console.log('getPermissions');
+        let response = await axios.get( route('getPermissions') );
+        //console.log(response.data.permissions);
+        permissions.value = response.data.data;
+    };
 
-    return {permissions, getPermissions}
+    const getPermissionsToSelect = async () => {
+        //console.log('getPermissionsToSelect');
+
+        let response = await axios.get( route('getPermissionsToSelect') );
+        //console.log(response.data.data);
+        permissionsToSelect.value = response.data.data;
+    };
+
+    return {
+        permissions, permissionsToSelect, 
+        getPermissions, getPermissionsToSelect
+    };
 }

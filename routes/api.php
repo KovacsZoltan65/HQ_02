@@ -18,8 +18,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// /api/permissions
-Route::get(
-    '/permissions', 
-    [\App\Http\Controllers\Admin\PermissionController::class, 'getPermissionsToSelect']
-)->name('permissions');
+// /api/get_permissions
+//Route::get(
+//    '/get_permissions', 
+//    [
+//        \App\Http\Controllers\Admin\PermissionController::class, 
+//        'getPermissionsToSelect'
+//    ]
+//)->name('get_permissions');
+
+// /api/get_roles
+//Route::get(
+//    '/get_roles', 
+//    [App\Http\Controllers\Admin\RoleController::class, 'getRolesToSelect']
+//)->name('get_roles');

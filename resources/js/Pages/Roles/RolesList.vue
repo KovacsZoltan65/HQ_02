@@ -1,6 +1,7 @@
 <script setup>
     import { reactive, onMounted, ref, watch } from 'vue';
     import axios from 'axios';
+    import { InertiaProgress } from '@inertiajs/progress';
     import { Head, Link } from '@inertiajs/vue3';
     import MainLayout from '@/Layouts/MainLayout.vue';
     import VPagination from '@hennge/vue3-pagination';
@@ -10,7 +11,31 @@
     import Swal from 'sweetalert2';
     import 'sweetalert2/dist/sweetalert2.min.css';
 
-    import * as perm from '../../services/permissions';
+    // ===================================
+    // Progress
+    // ===================================
+    InertiaProgress.init({
+        // The delay after which the progress bar will appear, in milliseconds...
+        delay: 250,
+
+        // The color of the progress bar...
+        color: '#29d',
+
+        // Whether to include the default NProgress styles...
+        includeCSS: true,
+
+        // Whether the NProgress spinner will be shown...
+        showSpinner: true,
+    });
+
+    // ===================================
+    // Services
+    // ===================================
+    import usePermissions from '../../services/permissions';
+    const {
+        permissions, permissionsToSelect, 
+        getPermissions, getPermissionsToSelect
+    } = usePermissions();
     //const { permissions, getPermissions, getPermissionsToSelect } = usePermissions();
 
     // =============================
@@ -20,11 +45,11 @@
     
     const myValue = '';
     
-    const myOptions = [
-        {id: 1, text: 'value 01'}, 
-        {id: 2, text: 'value 02'}, 
-        {id: 3, text: 'value 03'}
-    ];
+    //const myOptions = [
+    //    {id: 1, text: 'value 01'}, 
+    //    {id: 2, text: 'value 02'}, 
+    //    {id: 3, text: 'value 03'}
+    //];
     const myChangeEvent = (val) => { console.log('myChangeEvent', val); };
     const mySelectEvent = ({id, text}) => { console.log('mySelectEvent', {id, text}); };
     // =============================
@@ -297,6 +322,7 @@
         }
         
         //getPermissions();
+        getPermissionsToSelect();
 
         getRecords();
     });
@@ -325,6 +351,7 @@
     <Head :title="$t('roles')"/>
 
     <MainLayout>
+        
         <!-- CONTENT HEADER -->
         <div class="content-header">
             <div class="container-fluid">
@@ -545,7 +572,7 @@
                             <div class="form-group">
                                 <label>{{ $t('permissions') }}</label>
                                 <Select2 id="permissions" name="permissions" 
-                                         :options="myOptions"
+                                         :options="permissionsToSelect"
                                          :settings="{
                                             width: '100%',
                                             multiple: true,

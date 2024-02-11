@@ -75,7 +75,23 @@ Route::resource('/subdomains', \App\Http\Controllers\SubdomainController::class)
 // ===============================
 // ROLES
 // ===============================
-Route::get('/getRoles', [\App\Http\Controllers\Admin\RoleController::class, 'getRoles'])->name('getRoles');
+// Szerepkörök lekérése táblázathoz
+Route::get(
+    '/getRoles', 
+    [
+        \App\Http\Controllers\Admin\RoleController::class, 
+        'getRoles'
+    ]
+)->name('getRoles');
+// Szerepkörök lekérése lenyílóhoz
+Route::get(
+    '/getRolesToSelect', 
+    [
+        \App\Http\Controllers\Admin\RoleController::class, 
+        'getRolesToSelect'
+    ]
+)->name('getRolesToSelect');
+// Csoportos törlés
 Route::delete('/roles/{role}/bulkDelete', [\App\Http\Controllers\RoleController::class, 'bulkDelete'])->name('roles_bulkDelete');
 
 Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->names([
@@ -92,7 +108,23 @@ Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->na
 // ===============================
 // PERMISSIONS
 // ===============================
-Route::get('/getPermissions', [\App\Http\Controllers\Admin\PermissionController::class, 'getPermissions'])->name('getPermissions');
+//
+Route::get(
+    '/getPermissions', 
+    [
+        \App\Http\Controllers\Admin\PermissionController::class, 
+        'getPermissions'
+    ]
+    )->name('getPermissions');
+//
+Route::get(
+    '/getPermissionsToSelect', 
+    [
+        \App\Http\Controllers\Admin\PermissionController::class, 
+        'getPermissionsToSelect'
+    ]
+)->name('getPermissionsToSelect');
+//
 Route::delete('/permissions/{permission}/bulkDelete', [\App\Http\Controllers\PermissionController::class, 'bulkDelete'])->name('permissions_bulkDelete');
 
 Route::resource('/permissions', \App\Http\Controllers\Admin\PermissionController::class)->names([

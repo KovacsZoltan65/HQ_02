@@ -29,12 +29,9 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
-        $permissions = \App\Models\Permission::select('id', 'name')
-            ->get()->toArray();
         //dd($permissions);
         return Inertia::render('Roles/RolesList', [
             'can' => $this->_getRoles(),
-            'permissions' => $permissions,
         ]);
     }
     
@@ -85,6 +82,10 @@ class RoleController extends Controller
         return response()->json($data, Response::HTTP_OK);
     }
 
+    public function getRolesToSelect(){
+        return \App\Http\Resources\RoleResource::collection(Role::all());
+    }
+    
     /**
      * Show the form for creating a new resource.
      */
