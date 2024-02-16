@@ -1,6 +1,7 @@
 <script setup>
     import { reactive, onMounted, ref, watch } from 'vue';
     import axios from 'axios';
+    import { InertiaProgress } from '@inertiajs/progress';
     import { Head, Link } from '@inertiajs/vue3';
     import MainLayout from '@/Layouts/MainLayout.vue';
     import VPagination from '@hennge/vue3-pagination';
@@ -21,6 +22,34 @@
     const errors = ref({});
     const selectedRecords = ref([]);
     const selectAll = ref(false);
+
+    // ===================================
+    // Services
+    // ===================================
+    import usePermissions from '../../services/permissions.js';
+    const {
+        permissions, permissionsToSelect,
+        getPermissions, getPermissionsToSelect,
+        permissionCreate,permissionUpdate,
+        permissionDelete,permissionBulkDelete,permissionRestore
+    } = usePermissions();
+
+    // ===================================
+    // Progress
+    // ===================================
+    InertiaProgress.init({
+        // The delay after which the progress bar will appear, in milliseconds...
+        delay: 250,
+
+        // The color of the progress bar...
+        color: '#29d',
+
+        // Whether to include the default NProgress styles...
+        includeCSS: true,
+
+        // Whether the NProgress spinner will be shown...
+        showSpinner: true,
+    });
 
     // Általános alert
     const alerta = Swal.mixin({
@@ -234,6 +263,23 @@
     // ADATLEKÉRÉS
     // =====================
     const getRecords = async (page = state.pagination.current_page) => {
+        
+//console.log('getRecords');
+
+        getPermissions({
+            filters: state.filter, 
+            config: {
+                per_page: state.pagination.per_page
+            }, page
+        });
+//console.log('permissions', permissions);
+        //state.pagination.current_page = permissions.current_page;
+        //state.pagination.total_number_of_pages = permissions.last_page;
+
+//console.log('permissions', permissions.data);
+        //state.Records.value = permissions.data;
+
+        /*
         axios.get(route('getPermissions', {
             filters: state.filter, 
             config: {
@@ -251,9 +297,10 @@
         .catch(error => {
             console.log('getRecords error', error);
         });
+        */
     };
 
-    onMounted(async () => {
+    onMounted(() => {
         
         let columns = localStorage.getItem(local_storage_column_key);
         if( columns ){
@@ -288,6 +335,7 @@
 <template>
     <Head :title="$t('permissions')"/>
     <MainLayout>
+        
         <!-- CONTENT HEADER -->
         <div class="content-header">
             <div class="container-fluid">
@@ -403,7 +451,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="Record in state.Records" 
+                                        <tr v-for="Record in permissions.data" 
                                             :key="Record.id">
                                             <!-- checkbox a sor elején -->
                                             <td>
@@ -438,8 +486,8 @@
                             </div>
 
                             <div class="card-footer">
-                                <v-pagination v-model="state.pagination.current_page" 
-                                              :pages="state.pagination.total_number_of_pages"
+                                <v-pagination v-model="permissions.current_page" 
+                                              :pages="permissions.last_page"
                                               :range-size="state.pagination.range"
                                               active-color="#DCEDFF"
                                               @update:modelValue="getRecords"/>

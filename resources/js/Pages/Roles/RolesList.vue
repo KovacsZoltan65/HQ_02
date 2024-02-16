@@ -33,10 +33,15 @@
     // ===================================
     import usePermissions from '../../services/permissions';
     const {
-        permissions, permissionsToSelect, 
-        getPermissions, getPermissionsToSelect
+        permissionsToSelect, getPermissionsToSelect,
     } = usePermissions();
-    //const { permissions, getPermissions, getPermissionsToSelect } = usePermissions();
+    import useRoles from '../../services/roles';
+    const {
+        roles, rolesToSelect,
+        roleCreate,roleUpdate,
+        roleDelete,rolesBulkDelete,roleRestore
+    } = useRoles();
+
 
     // =============================
     // = SELECT2

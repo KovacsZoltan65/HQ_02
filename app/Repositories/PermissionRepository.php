@@ -16,7 +16,7 @@ namespace App\Repositories;
 class PermissionRepository extends BaseRepository implements \App\Interfaces\PermissionRepositoryInterface
 {
     /**
-     * Specify Model class name
+     * Get the class name of the Model
      *
      * @return string
      */
@@ -28,7 +28,7 @@ class PermissionRepository extends BaseRepository implements \App\Interfaces\Per
     
 
     /**
-     * Boot up the repository, pushing criteria
+     * Boot up the repository by pushing permission criteria
      */
     public function boot()
     {
