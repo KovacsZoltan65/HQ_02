@@ -27,16 +27,14 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         //dd($permissions);
         return Inertia::render('Roles/RolesList', [
             'can' => $this->_getRoles(),
         ]);
     }
     
-    public function getRoles(Request $request)
-    {
+    public function getRoles(Request $request) {
         //
         $config = $request->get('config', []);
         //
@@ -82,15 +80,14 @@ class RoleController extends Controller
         return response()->json($data, Response::HTTP_OK);
     }
 
-    public function getRolesToSelect(){
+    public function getRolesToSelect() {
         return \App\Http\Resources\RoleResource::collection(Role::all());
     }
     
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
-    {
+    public function create(Request $request) {
         $role = new Role();
         
         return Inertia::render('Roles/RolesCreate', [
@@ -102,8 +99,7 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRoleRequest $request)
-    {
+    public function store(StoreRoleRequest $request) {
         //dd('RoleController@store $request', $request->all());
         $role = $this->repository->create($request->all());
         
@@ -113,24 +109,17 @@ class RoleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Role $role)
-    {
-        //
-    }
+    public function edit(Role $role) {}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRoleRequest $request, $id)
-    {
+    public function update(UpdateRoleRequest $request, $id) {
         //dd('RoleController@update $request', $request->all(), $id);
         $role = $this->repository->update($request->all(), $id);
         
@@ -140,16 +129,14 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Role $role)
-    {
+    public function destroy(Role $role) {
         //dd('RoleController@destroy', $role);
-        $this->repository->delete($role->id);
+        //$this->repository->delete($role->id);
         
         return redirect()->back()->with('message', __('roles_deleted'));
     }
     
-    public function bulkDelete()
-    {
+    public function bulkDelete() {
         //dd('RoleController@bulkDelete', $request->all());
         Role::whereIn('id', request('ids'))->delete();
 

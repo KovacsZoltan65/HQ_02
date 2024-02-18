@@ -92,7 +92,7 @@ Route::get(
     ]
 )->name('getRolesToSelect');
 // Csoportos törlés
-Route::delete('/roles/{role}/bulkDelete', [\App\Http\Controllers\RoleController::class, 'bulkDelete'])->name('roles_bulkDelete');
+Route::delete('/roles/{role}/bulkDelete', [\App\Http\Controllers\Admin\RoleController::class, 'bulkDelete'])->name('roles_bulkDelete');
 
 Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->names([
       'index' => 'roles',
@@ -108,7 +108,7 @@ Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->na
 // ===============================
 // PERMISSIONS
 // ===============================
-//
+// Összes jogosultság lekérése
 Route::get(
     '/getPermissions', 
     [
@@ -116,7 +116,26 @@ Route::get(
         'getPermissions'
     ]
     )->name('getPermissions');
-//
+
+// Összes jogosultság táblázathoz
+Route::get(
+    '/getPermissionsToTable', 
+    [
+        \App\Http\Controllers\Admin\PermissionController::class,  
+        'getPermissionsToTable'
+    ]
+)->name('getPermissionsToTable');
+
+// Jofosultság lekérése azonosító alapján
+Route::get(
+    '/getPermissionById/{id}', 
+    [
+        \App\Http\Controllers\Admin\PermissionController::class, 
+        'getPermissionById'
+    ]
+)->name('getPermissionById');
+
+// Jogosultságok lekérése lenyílóhoz
 Route::get(
     '/getPermissionsToSelect', 
     [
@@ -124,9 +143,14 @@ Route::get(
         'getPermissionsToSelect'
     ]
 )->name('getPermissionsToSelect');
-//
-Route::delete('/permissions/{permission}/bulkDelete', [\App\Http\Controllers\PermissionController::class, 'bulkDelete'])->name('permissions_bulkDelete');
 
+// Több jogosultság törlése
+Route::delete(
+    '/permissions/{permission}/bulkDelete', 
+    [\App\Http\Controllers\Admin\PermissionController::class, 'bulkDelete']
+)->name('permissions_bulkDelete');
+
+//
 Route::resource('/permissions', \App\Http\Controllers\Admin\PermissionController::class)->names([
       'index' => 'permissions',
      'create' => 'permissions_create',

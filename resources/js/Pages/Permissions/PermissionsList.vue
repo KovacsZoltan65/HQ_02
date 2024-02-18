@@ -19,6 +19,23 @@
         }
     });
 
+    // ===================================
+    // Progress
+    // ===================================
+    InertiaProgress.init({
+        // The delay after which the progress bar will appear, in milliseconds...
+        delay: 250,
+
+        // The color of the progress bar...
+        color: '#29d',
+
+        // Whether to include the default NProgress styles...
+        includeCSS: true,
+
+        // Whether the NProgress spinner will be shown...
+        showSpinner: true,
+    });
+
     const errors = ref({});
     const selectedRecords = ref([]);
     const selectAll = ref(false);
@@ -26,12 +43,13 @@
     // ===================================
     // Services
     // ===================================
-    import usePermissions from '../../services/permissions.js';
+    import usePermissions from '@/services/permissions.js';
     const {
-        permissions, permissionsToSelect,
-        getPermissions, getPermissionsToSelect,
-        permissionCreate,permissionUpdate,
-        permissionDelete,permissionBulkDelete,permissionRestore
+        permissions, permissionsToSelect, permissionsToTable, permission, 
+        getPermissions, getPermissionsToTable, getPermissionsToSelect, getPermissionById,
+        permissionCreate, permissionUpdate,
+        permissionDelete, permissionBulkDelete, permissionRestore
+
     } = usePermissions();
 
     // ===================================
@@ -65,13 +83,7 @@
         cancelButtonColor: '#d33',
     });
 
-    const newRecord = () => {
-        return {
-            id: 0,
-            name: 'role_01',
-            guard_name: 'web',
-        };
-    };
+    const newRecord = () => ({ id: 0, name: 'role_01', guard_name: 'web' });
 
     const state = reactive({
         Records: [],
@@ -113,63 +125,69 @@
     // ÚJ REKORD
     // =====================
     const newRecord_init = () => {
+        
         cancelEdit();
-        state.isEdit = false;
+        openEditModal();
 
+    };
+    
+    /**
+     * Create a new record using the provided data
+     */
+    const createRecord = async () => {
+        //console.log('state.Record', state.editingRecord);
+        try{
+            permissionCreate(state.editingRecord);
+
+            alerta.fire(trans('permissions_created'), '', 'info');
+
+            closeEditModal();
+        }catch(error){
+            console.error('permissions createRecord', error);
+        }
+    };
+
+    /**
+     * Edit a record
+     * @param {Object} record - The record to be edited
+     */
+    const editRecord = (record) => {
+        // Set the record to be edited
+        state.editingRecord = record;
+
+        // Set the edit mode to true
+        state.isEdit = true;
+
+        // Open the edit modal
         openEditModal();
     };
     
-    const createRecord = () => {
-        errors.value = '';
+    /**
+     * Update a record and handle the response
+     */
+    const updateRecord = async () => {
 
-        axios.post(route('permissions'), state.Record)
-        .then(resource => {
-            //console.log('createRecord', resource);
-            state.Records.push(resource.data.permission);
-
-            alerta.fire(trans('permissions_created'), '', 'info');
-        })
-        .catch(error => {
-            console.log('createRecord error', error); 
-        });
-    };
-
-    // =====================
-    // REKORD SZERKESZTÉSE
-    // =====================
-    const editRecord = (record) => {
-        state.editingRecord = record;
-        //console.log('state.editingRecord', state.editingRecord);
-        state.isEdit = true;
-
-        openEditModal();
-    };
-    const updateRecord = () => {
-        errors.value = '';
-
-        axios.put(route('permissions_update', {permission: state.editingRecord.id}), {
+        let result = permissionUpdate({permission: state.editingRecord.id}, {
             id: state.editingRecord.id,
             name: state.editingRecord.name,
             guard_name: state.editingRecord.guard_name,
-        })
-        .then(response => {
-            for(let i = 0; i < state.Records.length; i++){
-                if( state.Records[i].id == state.editingRecord.id ){
-                    state.Records[i] = response.data;
-                }
-            }
+        });
 
+        if( result ){
             cancelEdit();
-
             closeEditModal();
 
             alerta.fire(trans('permissions_updated'), '', 'info');
-        })
-        .catch(error => { console.log('updateRecord error', error); });
+        }
     };
 
+    /**
+     * Cancels the edit mode and resets the editing record to a new record.
+     */
     const cancelEdit = () => {
-        state.editingRecord = newRecord();
+        // Reset the editing record to a new record
+        state.editingRecord = { ...newRecord() };
+        // Set edit mode to false
         state.isEdit = false;
     };
 
@@ -178,11 +196,6 @@
     // =====================
     // törlés előkészítése
     const confirmDelete = (record) => {
-        /*
-        state.deletingRecord = record;
-        
-        openDeleteModal();
-        */
         delete_alert.fire({
             text: trans('permissions_delete_confirmation', {name: record.name}),
             confirmButtonText: trans('yes'),
@@ -195,6 +208,10 @@
             if( result.isConfirmed ){
                 state.deletingRecord = record;
                 deleteRecord();
+
+                getPermissionsToTable();
+
+                alerta.fire(trans('permissions_deleted'), '', 'info');
             }else if( result.isDenied ){
                 state.deletingRecord = newRecord();
                 alerta.fire(trans('deletion_aborted'), '', 'info');
@@ -203,14 +220,10 @@
     };
 
     // rekord törlése
-    const deleteRecord = () => {
-        axios.delete(`/permissions/${state.deletingRecord.id}`)
-        .then(response => {
-            state.Records = state.Records.filter(item => item.id !== state.deletingRecord.id);
-        })
-        .catch(error => {
-            console.log('deleteRecord error', error);
-        });
+    const deleteRecord = async () => {
+        const response = await permissionDelete(state.deletingRecord.id);
+
+        return response;
     };
 
     const bulkDelete = () => {
@@ -240,64 +253,53 @@
     // KIJELÖLÉS
     // =====================
 
+    /**
+     * Select all records and update the selectedRecords value accordingly.
+     */
     const selectAllRecord = () => {
-        if( selectAll.value ){
-            selectedRecords.value = state.Records.map(record => record.id);
-        }else{
-            selectedRecords.value = [];
-        }
+        /**
+         * If selectAll checkbox is checked, map all record IDs to selectedRecords; otherwise, set selectedRecords to empty array.
+         */
+        selectedRecords.value = selectAll.value ? state.Records.map(record => record.id) : [];
     };
 
+    /**
+     * Toggles the selection of a record by adding or removing its ID from the selectedRecords array.
+     * @param {number} id - The ID of the record to toggle selection for.
+     */
     const toggleSelection = (id) => {
+        // Check if the record ID is already in the selectedRecords array
         const index = selectedRecords.value.indexOf(id);
 
-        if( index === -1 ){
-            selectedRecords.value.push(id);
-        }else{
-            selectedRecords.value.splice(index, 1);
+        // If the record ID is not in the array, add it
+        if (index === -1) {
+            selectedRecords.value = [...selectedRecords.value, id];
+        }
+        // If the record ID is already in the array, remove it
+        else {
+            selectedRecords.value = selectedRecords.value.filter(recordId => recordId !== id);
         }
     };
     
     
-    // =====================
-    // ADATLEKÉRÉS
-    // =====================
+    /**
+     * Retrieve records from the server
+     * @param {number} page - The page number to retrieve
+     */
     const getRecords = async (page = state.pagination.current_page) => {
-        
-//console.log('getRecords');
-
-        getPermissions({
+        /**
+         * Retrieve permissions with specified filters and pagination configuration
+         * @param {Object} filters - The filters to apply
+         * @param {Object} config - The pagination configuration
+         * @param {number} page - The page number to retrieve
+         */
+        await getPermissionsToTable({
             filters: state.filter, 
             config: {
                 per_page: state.pagination.per_page
-            }, page
+            },
+            page
         });
-//console.log('permissions', permissions);
-        //state.pagination.current_page = permissions.current_page;
-        //state.pagination.total_number_of_pages = permissions.last_page;
-
-//console.log('permissions', permissions.data);
-        //state.Records.value = permissions.data;
-
-        /*
-        axios.get(route('getPermissions', {
-            filters: state.filter, 
-            config: {
-                per_page: state.pagination.per_page
-            }, page
-        }))
-        .then(response => {
-            state.Records = response.data.permissions.data;
-            selectedRecords.value = [];
-            selectAll.value = false;
-
-            state.pagination.current_page = response.data.permissions.current_page;
-            state.pagination.total_number_of_pages = response.data.permissions.last_page;
-        })
-        .catch(error => {
-            console.log('getRecords error', error);
-        });
-        */
     };
 
     onMounted(() => {
@@ -315,20 +317,54 @@
 
     const settings_init = () => { openSettingsModal(); };
 
-    // =====================
-    // MODAL KEZELÉS
-    // =====================
-    const openSettingsModal = () => { $('#settingsModal').modal('show'); };
-    const closeSettingsModal = () => { $('#settingsModal').modal('hide'); };
-
-    const openEditModal = () => { $('#editModal').modal('show'); };
-    const closeEditModal = () => {
-        cancelEdit();
-        $('#editModal').modal('hide');
+    /**
+     * Opens the settings modal if it exists.
+     */
+    const openSettingsModal = () => {
+        $('#settingsModal').modal('show');
     };
 
-    //const openDeleteModal = () => { $('#deleteModal').modal('show'); };
-    //const closeDeleteModal = () => { $('#deleteModal').modal('hide'); };
+    /**
+     * Closes the settings modal by setting its display to 'none'.
+     */
+    const closeSettingsModal = () => {
+        $('#settingsModal').modal('hide');
+    };
+
+    /**
+     * Opens the edit modal if it exists.
+     */
+    const openEditModal = () => {
+        $('#editModal').modal('show');
+    };
+
+    /**
+     * Closes the edit modal and cancels any ongoing edits.
+     */
+    const closeEditModal = () => {
+
+        cancelEdit();
+        
+         $('#editModal').modal('hide');
+    };
+
+    /**
+     * Megnyitja a törlési módot, ha létezik.
+     */
+    const openDeleteModal = () => {
+        
+        $('#deleteModal').modal('show');
+
+    };
+
+    /**
+     * Bezárja a törlési módot az elrejtéssel.
+     */
+    const closeDeleteModal = () => {
+        
+        $('#deleteModal').modal('hide');
+
+    };
 
 </script>
 
@@ -451,7 +487,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="Record in permissions.data" 
+                                        <tr v-for="Record in permissionsToTable.data" 
                                             :key="Record.id">
                                             <!-- checkbox a sor elején -->
                                             <td>
@@ -486,8 +522,8 @@
                             </div>
 
                             <div class="card-footer">
-                                <v-pagination v-model="permissions.current_page" 
-                                              :pages="permissions.last_page"
+                                <v-pagination v-model="permissionsToTable.current_page" 
+                                              :pages="permissionsToTable.last_page"
                                               :range-size="state.pagination.range"
                                               active-color="#DCEDFF"
                                               @update:modelValue="getRecords"/>

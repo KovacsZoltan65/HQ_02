@@ -173,6 +173,7 @@
 
         openEditModal();
     };
+    
     const updateRecord = () => {
         errors.value = '';
 

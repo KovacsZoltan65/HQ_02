@@ -43,16 +43,14 @@ class PermissionController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getPermissions(Request $request)
+    public function getPermissionsToTable(Request $request)
     {
-//\Log::info( 'request: ' . print_r($request->all(), true) );
         // Szerezze be a konfigurációt és a szűrőket a kérésből
         $config = $request->input('config', []);
-//\Log::info('config: ' . print_r($config, true));
         $filters = $request->input('filters', []);
-//\Log::info('filters: ' . print_r($filters, true));
+        // Oldal
         $page = $request->input('page', 1);
-//\Log::info('page: ' . print_r($page, true));
+        
         // Engedélyek keresése, ha van keresési szűrő
         if( isset($filters['search']) )
         {
@@ -72,7 +70,6 @@ class PermissionController extends Controller
         
         // Állítsa be az oldalankénti engedélyek számát
         $per_page = $config['per_page'] ?? config('app.per_page');
-//\Log::info('per_page: ' . print_r($per_page, true));
         // Szerezze be az engedélyeket oldalszámozással
         $permissions = Permission::query()->paginate($per_page);
         
@@ -87,46 +84,17 @@ class PermissionController extends Controller
         return response()->json($data, Response::HTTP_OK);
     }
 
-/*
-    public function getPermissions(Request $request)
-    {
-        //
-        $config = $request->get('config', []);
-        //
-        $filters = $request->get('filters', []);
-        
-        if( count($filters) > 0 )
-        {
-            if( isset($filters['search']) )
-            {
-                $value = $filters['search'];
-                $this->repository->findWhere([
-                    ['name','like', "%$value%"],
-                    ['guard_name', 'like', "%$value%"],
-                ]);
-            }
-            
-            $column = (isset($filters['column'])) ? $filters['column'] : 'name';
-            $direction = (isset($filters['direction'])) ? '' : 'asc';
-            
-            $this->repository->orderBy($column, $direction);
-        }
-        
-        $per_page = count($config) != 0 && isset($config['per_page']) 
-            ? $config['per_page'] 
-            : config('app.per_page');
-        
-        $permissions = Permission::query()->paginate($per_page);
-        
-        $data = [
-            'permissions' => $permissions,
-            'config' => $config,
-            'filters' => $filters,
-        ];
-        
-        return response()->json($data, Response::HTTP_OK);
+    public function getPermissions(){
+        $permissions = Permission::all();
+
+        return response()->json($permissions, Response::HTTP_OK);
     }
-    */
+
+    public function getPermissionById($id){
+        $permission = Permission::find($id);
+
+        return response()->json($permission, Response::HTTP_OK);
+    }
 
     /**
     * Retrieve permissions to select
@@ -141,8 +109,7 @@ class PermissionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
-    {
+    public function create(Request $request) {
         $permission = new Permission();
         
         return Inertia::render('Permissions/PermissionsCreate', [
@@ -154,8 +121,8 @@ class PermissionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePermissionRequest $request)
-    {
+    public function store(StorePermissionRequest $request) {
+
         $permission = $this->repository->create($request->all());
         
         return redirect()->back()->with('message', __('permissions_created'));
@@ -164,41 +131,36 @@ class PermissionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Permission $permission)
-    {
-        //
-    }
+    public function edit(Permission $permission) {}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePermissionRequest $request, $id)
-    {
+    public function update(UpdatePermissionRequest $request, $id) {
         $permission = $this->repository->update($request->all(), $id);
         
-        return response()->json($role, Response::HTTP_OK);
+        return response()->json($permission, Response::HTTP_OK);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Permission $permission)
-    {
-        $this->repository->delete($permission->id);
+    public function destroy(Permission $permission) {
         
-        return redirect()->back()->with('message', __('permissions_deleted'));
+        $this->repository->delete($permission->id);
+        //return redirect()->back()->with('message', __('permissions_deleted'));
+        return response()->json([
+            'success' => true,
+            'message' => __('permissions_deleted'),
+        ], 200);
     }
     
-    public function bulkDelete()
-    {
+    public function bulkDelete() {
         Permission::whereIn('id', request('ids'))->delete();
 
         return redirect()->back()->with('message', __('permissions_bulk_updated'));
@@ -210,8 +172,7 @@ class PermissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function restore($id)
-    {
+    public function restore($id) {
         // Restore the permission by id
         Permission::onlyTrashed()->where('id', $id)->restore();
         
@@ -219,7 +180,7 @@ class PermissionController extends Controller
         return redirect()->back()->with('message', __('permissions_restored'));
     }
     
-    public function _getRoles(){
+    public function _getRoles() {
         return [
             //'list' => Auth::user()->can('permission list'),
             //'create' => Auth::user()->can('permission create'),
