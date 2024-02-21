@@ -24,69 +24,78 @@ class RoleController extends Controller
         //$this->middleware('can:role edit', ['only' => ['edit', 'update']]);
         //$this->middleware('can:role delete', ['only' => ['destroy', 'bulkDelete']]);
     }
+    
     /**
      * Display a listing of the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Inertia\Response
      */
     public function index(Request $request) {
-        //dd($permissions);
         return Inertia::render('Roles/RolesList', [
             'can' => $this->_getRoles(),
         ]);
     }
     
-    public function getRoles(Request $request) {
-        //
-        $config = $request->get('config', []);
-        //
-        $filters = $request->get('filters', []);
+    public function getRolesToTable(Request $request) {
+        // Szerezze be a konfigurációt és a szűrőket a kérésből
+        $config = $request->input('config', []);
+        $filters = $request->input('filters', []);
+        // Oldal
+        $page = $request->input('page', 1);
         
-        if( count($filters) > 0 )
+        // Engedélyek keresése, ha van keresési szűrő
+        if( isset($filters['search']) )
         {
-            if( isset($filters['search']) )
-            {
-                $value = $filters['search'];
-                $this->repository->findWhere([
-                    ['name','like', "%$value%"],
-                    ['guard_name', 'like', "%$value%"],
-                ]);
-            }
-            
-            $column = (isset($filters['column'])) ? $filters['column'] : 'name';
-            $direction = (isset($filters['direction'])) ? '' : 'asc';
-            
-            $this->repository->orderBy($column, $direction);
+            $value = $filters['search'];
+            $this->repository->findWhere([
+                ['name','like', "%$value%"],
+                ['guard_name', 'like', "%$value%"],
+            ]);
         }
         
-        $per_page = count($config) != 0 && isset($config['per_page']) 
-            ? $config['per_page'] 
-            : config('app.per_page');
+        // Állítsa be a rendelés oszlopát és irányát
+        $column = $filters['column'] ?? 'name';
+        $direction = $filters['direction'] ?? 'asc';
         
-        $roles = Role::query()->paginate($per_page);
+        // Rendelés alkalmazása a lekérdezésre
+        //$this->repository->orderBy($column, $direction);
         
-        foreach( $roles as $role ){
-            $rolePermissions = \App\Models\Permission::join("role_has_permissions", "role_has_permissions.permission_id", "=", "permissions.id")
-                ->where("role_has_permissions.role_id", $role->id)
-                ->select('id', 'name')
-                ->get()->toArray();
-            $role->permissions = $rolePermissions;
-        }
+        // Állítsa be az oldalankénti engedélyek számát
+        //$per_page = $config['per_page'] ?? config('app.per_page');
+        // Szerezze be az engedélyeket oldalszámozással
+        //$roles = Role::query()->paginate($per_page);
+        $roles = $this->repository
+            ->orderBy($column, $direction)
+            ->paginate( $config['per_page'] ?? config('app.per_page') );
         
+        // Készítse elő a visszaküldendő adatokat
         $data = [
-            'roles' => $roles,
+            'data' => $roles,
             'config' => $config,
             'filters' => $filters,
         ];
-        \Log::info( print_r($data, true) );
+        
+        // Adja vissza az adatokat JSON-válaszként
         return response()->json($data, Response::HTTP_OK);
     }
+    
+    public function getRoles() {
+        $roles = Role::all();
 
+        return response()->json($roles, Response::HTTP_OK);
+    }
+    
+    public function getRoleById($id) {
+        $role = Role::find($id);
+
+        return response()->json($role, Response::HTTP_OK);
+    }
+    
     public function getRolesToSelect() {
         return \App\Http\Resources\RoleResource::collection(Role::all());
     }
     
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(Request $request) {
         $role = new Role();
         
@@ -95,64 +104,56 @@ class RoleController extends Controller
             'role' => $role,
         ]);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(StoreRoleRequest $request) {
-        //dd('RoleController@store $request', $request->all());
+
         $role = $this->repository->create($request->all());
         
         return redirect()->back()->with('message', __('roles_created'));
     }
-
+    
     /**
      * Display the specified resource.
      */
     public function show(string $id) {}
-
+    
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Role $role) {}
-
+    
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateRoleRequest $request, $id) {
-        //dd('RoleController@update $request', $request->all(), $id);
         $role = $this->repository->update($request->all(), $id);
         
         return response()->json($role, Response::HTTP_OK);
     }
-
+    
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Role $role) {
-        //dd('RoleController@destroy', $role);
-        //$this->repository->delete($role->id);
         
-        return redirect()->back()->with('message', __('roles_deleted'));
+        $this->repository->delete($role->id);
+        //return redirect()->back()->with('message', __('roles_deleted'));
+        return response()->json([
+            'success' => true,
+            'message' => __('roles_deleted'),
+        ], 200);
     }
     
+    
     public function bulkDelete() {
-        //dd('RoleController@bulkDelete', $request->all());
         Role::whereIn('id', request('ids'))->delete();
 
         return redirect()->back()->with('message', __('roles_bulk_updated'));
     }
     
-    public function restore($id)
-    {
-        //dd('RoleController@restore', $id);
-        $role = Role::onlyTrashed()->find($id);
-        $role->restore();
-        
-        return redirect()->back()->with('message', __('roles_restored'));
-    }
     
-    public function _getRoles(){
+    
+    public function _getRoles() {
         return [
             //'list' => Auth::user()->can('role list'),
             //'create' => Auth::user()->can('role create'),

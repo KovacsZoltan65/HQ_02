@@ -83,15 +83,14 @@ export default function usePermissions(){
      */
     const permissionCreate = async (record) => {
         try {
-            // Send a POST request to the 'permissions' route with the provided record
-            const resource = await axios.post(route('permissions'), record);
-
-            return resource;
+            // Destructure the 'data' property from the response
+            const { data } = await axios.post(route('permissions'), record);
+            // Return the 'data' property directly
+            return data;
         } catch (error) {
             // Log any errors that occur during the creation process
             console.error('permissionCreate error', error);
         }
-        
     };
 
     /**
@@ -104,7 +103,6 @@ export default function usePermissions(){
         try {
             // Make a PUT request to update the permission record
             const result = await axios.put(route('permissions_update', id), record);
-            //console.log('permissionUpdate result', result);
             
             return result;
         } catch (error) {
@@ -115,26 +113,22 @@ export default function usePermissions(){
     /**
      * Deletes a permission by ID
      * @param {string} id - The ID of the permission to delete
+     * @returns {Promise} - The result of the permission deletion
      */
     const permissionDelete = async (id) => {
-        //console.log('permissionDelete', id);
         try {
-            const response = await axios.delete(`/permissions/${id}`);
-            //console.log('permissionDelete response', response);
-            //await axios.delete(`/permissions/${id}`);
-            //console.log('permissionDelete');
-            return response;
-
+            // Send a delete request to the server to delete the permission
+            return await axios.delete(`/permissions/${id}`);
         } catch (error) {
+            // Log any errors that occur during the permission deletion process
             console.error('permissionDelete error', error);
         }
     };
 
     const permissionBulkDelete = async (ids) => {
         try {
-            // Send a DELETE request to the permissions_bulkDelete route with the provided IDs
-            const response = await axios.delete(route('permissions_bulkDelete', { data: { ids: ids } }));
-            console.log('permissionBulkDelete response', response);
+            const response = await axios.delete('permissions_bulkDelete', { params: { ids } });
+            return response.data;
         } catch (error) {
             console.error('permissionBulkDelete error', error);
         }
@@ -148,7 +142,7 @@ export default function usePermissions(){
         try {
             // Send a POST request to restore the permission
             const response = await axios.post(route('permission_restore'), {data: {id: id}});
-            console.log('permissionRestore response', response);
+            return response;
         } catch (error) {
             // Log any errors that occur during the permission restore process
             console.error('permissionRestore error', error);

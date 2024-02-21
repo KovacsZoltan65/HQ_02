@@ -7,9 +7,17 @@
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
     import { trans } from 'laravel-vue-i18n';
-
     import Swal from 'sweetalert2';
     import 'sweetalert2/dist/sweetalert2.min.css';
+
+    const local_storage_column_key = 'ln_roles_grid_columns';
+
+    const props = defineProps({
+        can: {
+            type: Object,
+            default: () => ({})
+        }
+    });
 
     // ===================================
     // Progress
@@ -28,53 +36,38 @@
         showSpinner: true,
     });
 
-    // ===================================
-    // Services
-    // ===================================
-    import usePermissions from '../../services/permissions';
-    const {
-        permissionsToSelect, getPermissionsToSelect,
-    } = usePermissions();
-    import useRoles from '../../services/roles';
-    const {
-        roles, rolesToSelect,
-        roleCreate,roleUpdate,
-        roleDelete,rolesBulkDelete,roleRestore
-    } = useRoles();
-
-
-    // =============================
-    // = SELECT2
-    // =============================
-    import Select2 from 'vue3-select2-component';
-    
-    const myValue = '';
-    
-    //const myOptions = [
-    //    {id: 1, text: 'value 01'}, 
-    //    {id: 2, text: 'value 02'}, 
-    //    {id: 3, text: 'value 03'}
-    //];
-    const myChangeEvent = (val) => { console.log('myChangeEvent', val); };
-    const mySelectEvent = ({id, text}) => { console.log('mySelectEvent', {id, text}); };
-    // =============================
-
-    const local_storage_column_key = 'ln_roles_grid_columns';
-
-    const props = defineProps({
-        can: {
-            type: Object,
-            default: () => ({})
-        },
-        permissions: {
-            type: Object,
-            default: () => ({})
-        }
-    });
-
     const errors = ref({});
     const selectedRecords = ref([]);
     const selectAll = ref(false);
+
+    // ===================================
+    // Services
+    // ===================================
+    import useRoles from '@/services/roles.js';
+    const {
+        roles, rolesToSelect, rolesToTable, role, 
+        getRoles, getRolesToTable, getRolesToSelect, getRoleById,
+        roleCreate, roleUpdate,
+        roleDelete, roleBulkDelete, roleRestore
+
+    } = useRoles();
+
+    // ===================================
+    // Progress
+    // ===================================
+    InertiaProgress.init({
+        // The delay after which the progress bar will appear, in milliseconds...
+        delay: 250,
+
+        // The color of the progress bar...
+        color: '#29d',
+
+        // Whether to include the default NProgress styles...
+        includeCSS: true,
+
+        // Whether the NProgress spinner will be shown...
+        showSpinner: true,
+    });
 
     // Általános alert
     const alerta = Swal.mixin({
@@ -90,14 +83,7 @@
         cancelButtonColor: '#d33',
     });
 
-    const newRecord = () => {
-        return {
-            id: 0,
-            name: 'role_01',
-            guard_name: 'web',
-            permissions: []
-        };
-    };
+    const newRecord = () => ({ id: 0, name: 'role_01', guard_name: 'web' });
 
     const state = reactive({
         Records: [],
@@ -139,68 +125,69 @@
     // ÚJ REKORD
     // =====================
     const newRecord_init = () => {
+        
         cancelEdit();
-        state.isEdit = false;
-
         openEditModal();
+
     };
     
-    const createRecord = () => {
-        errors.value = '';
-
-        axios.post(route('roles'), state.Record)
-        .then(resource => {
-            //console.log('createRecord', resource);
-            state.Records.push(resource.data.role);
+    /**
+     * Create a new record using the provided data
+     */
+    const createRecord = async () => {
+        //console.log('state.Record', state.editingRecord);
+        try{
+            roleCreate(state.editingRecord);
 
             alerta.fire(trans('roles_created'), '', 'info');
-        })
-        .catch(error => {
-            console.log('createRecord error', error); 
-        });
+
+            closeEditModal();
+        }catch(error){
+            console.error('roles createRecord', error);
+        }
     };
 
-    // =====================
-    // REKORD SZERKESZTÉSE
-    // =====================
+    /**
+     * Edit a record
+     * @param {Object} record - The record to be edited
+     */
     const editRecord = (record) => {
-
-        //console.log('record', record);
-
+        // Set the record to be edited
         state.editingRecord = record;
-        //console.log('state.editingRecord', state.editingRecord);
+
+        // Set the edit mode to true
         state.isEdit = true;
 
+        // Open the edit modal
         openEditModal();
     };
     
-    const updateRecord = () => {
-        errors.value = '';
+    /**
+     * Update a record and handle the response
+     */
+    const updateRecord = async () => {
 
-        axios.put(route('roles_update', {role: state.editingRecord.id}), {
+        let result = roleUpdate({role: state.editingRecord.id}, {
             id: state.editingRecord.id,
             name: state.editingRecord.name,
             guard_name: state.editingRecord.guard_name,
-        })
-        .then(response => {
-            for(let i = 0; i < state.Records.length; i++){
-                console.log(state.Records[i]);
-                //if( state.Records[i].id == state.editingRecord.id ){
-                //    state.Records[i] = response.data;
-                //}
-            }
+        });
 
+        if( result ){
             cancelEdit();
-
             closeEditModal();
 
             alerta.fire(trans('roles_updated'), '', 'info');
-        })
-        .catch(error => { console.log('updateRecord error', error); });
+        }
     };
 
+    /**
+     * Cancels the edit mode and resets the editing record to a new record.
+     */
     const cancelEdit = () => {
-        state.editingRecord = newRecord();
+        // Reset the editing record to a new record
+        state.editingRecord = { ...newRecord() };
+        // Set edit mode to false
         state.isEdit = false;
     };
 
@@ -209,11 +196,6 @@
     // =====================
     // törlés előkészítése
     const confirmDelete = (record) => {
-        /*
-        state.deletingRecord = record;
-        
-        openDeleteModal();
-        */
         delete_alert.fire({
             text: trans('roles_delete_confirmation', {name: record.name}),
             confirmButtonText: trans('yes'),
@@ -226,6 +208,10 @@
             if( result.isConfirmed ){
                 state.deletingRecord = record;
                 deleteRecord();
+
+                getRolesToTable();
+
+                alerta.fire(trans('roles_deleted'), '', 'info');
             }else if( result.isDenied ){
                 state.deletingRecord = newRecord();
                 alerta.fire(trans('deletion_aborted'), '', 'info');
@@ -234,14 +220,10 @@
     };
 
     // rekord törlése
-    const deleteRecord = () => {
-        axios.delete(`/roles/${state.deletingRecord.id}`)
-        .then(response => {
-            state.Records = state.Records.filter(item => item.id !== state.deletingRecord.id);
-        })
-        .catch(error => {
-            console.log('deleteRecord error', error);
-        });
+    const deleteRecord = async () => {
+        const response = await roleDelete(state.deletingRecord.id);
+
+        return response;
     };
 
     const bulkDelete = () => {
@@ -264,61 +246,64 @@
 
     const cancelDelete = () => {
         state.deletingRecord = newRecord();
-        closeDeleteModal();
+        //closeDeleteModal();
     };
 
     // =====================
     // KIJELÖLÉS
     // =====================
 
+    /**
+     * Select all records and update the selectedRecords value accordingly.
+     */
     const selectAllRecord = () => {
-        if( selectAll.value ){
-            selectedRecords.value = state.Records.map(record => record.id);
-        }else{
-            selectedRecords.value = [];
-        }
+        /**
+         * If selectAll checkbox is checked, map all record IDs to selectedRecords; otherwise, set selectedRecords to empty array.
+         */
+        selectedRecords.value = selectAll.value ? state.Records.map(record => record.id) : [];
     };
 
+    /**
+     * Toggles the selection of a record by adding or removing its ID from the selectedRecords array.
+     * @param {number} id - The ID of the record to toggle selection for.
+     */
     const toggleSelection = (id) => {
+        // Check if the record ID is already in the selectedRecords array
         const index = selectedRecords.value.indexOf(id);
 
-        if( index === -1 ){
-            selectedRecords.value.push(id);
-        }else{
-            selectedRecords.value.splice(index, 1);
+        // If the record ID is not in the array, add it
+        if (index === -1) {
+            selectedRecords.value = [...selectedRecords.value, id];
+        }
+        // If the record ID is already in the array, remove it
+        else {
+            selectedRecords.value = selectedRecords.value.filter(recordId => recordId !== id);
         }
     };
     
     
-    // =====================
-    // ADATLEKÉRÉS
-    // =====================
+    /**
+     * Retrieve records from the server
+     * @param {number} page - The page number to retrieve
+     */
     const getRecords = async (page = state.pagination.current_page) => {
-        axios.get(route('getRoles', {
-            filters: state.filters, 
+        /**
+         * Retrieve roles with specified filters and pagination configuration
+         * @param {Object} filters - The filters to apply
+         * @param {Object} config - The pagination configuration
+         * @param {number} page - The page number to retrieve
+         */
+        await getRolesToTable({
+            filters: state.filter, 
             config: {
                 per_page: state.pagination.per_page
-            }, page
-        }))
-        .then(response => {
-            //console.log(response.data.roles.data);
-
-            state.Records = response.data.roles.data;
-            //console.log(state.Records);
-
-            selectedRecords.value = [];
-            selectAll.value = false;
-
-            state.pagination.total_number_of_pages = response.data.roles.last_page;
-            state.pagination.current_page = response.data.roles.current_page;
-        })
-        .catch(error => {
-            console.log('getRecords error', error);
+            },
+            page
         });
     };
 
-    onMounted(async () => {
-
+    onMounted(() => {
+        
         let columns = localStorage.getItem(local_storage_column_key);
         if( columns ){
             columns = JSON.parse(columns);
@@ -326,36 +311,65 @@
                 state.columns[column_name] = columns[column_name];
             }
         }
-        
-        //getPermissions();
-        getPermissionsToSelect();
 
         getRecords();
     });
 
     const settings_init = () => { openSettingsModal(); };
 
-    // =====================
-    // MODAL KEZELÉS
-    // =====================
-    const openSettingsModal = () => { $('#settingsModal').modal('show'); };
-    const closeSettingsModal = () => { $('#settingsModal').modal('hide'); };
-
-    const openEditModal = () => { $('#editModal').modal('show'); };
-    const closeEditModal = () => {
-        cancelEdit();
-        $('#editModal').modal('hide');
+    /**
+     * Opens the settings modal if it exists.
+     */
+    const openSettingsModal = () => {
+        $('#settingsModal').modal('show');
     };
 
-    const openDeleteModal = () => { $('#deleteModal').modal('show'); };
-    const closeDeleteModal = () => { $('#deleteModal').modal('hide'); };
+    /**
+     * Closes the settings modal by setting its display to 'none'.
+     */
+    const closeSettingsModal = () => {
+        $('#settingsModal').modal('hide');
+    };
+
+    /**
+     * Opens the edit modal if it exists.
+     */
+    const openEditModal = () => {
+        $('#editModal').modal('show');
+    };
+
+    /**
+     * Closes the edit modal and cancels any ongoing edits.
+     */
+    const closeEditModal = () => {
+
+        cancelEdit();
+        
+         $('#editModal').modal('hide');
+    };
+
+    /**
+     * Megnyitja a törlési módot, ha létezik.
+     */
+    const openDeleteModal = () => {
+        
+        $('#deleteModal').modal('show');
+
+    };
+
+    /**
+     * Bezárja a törlési módot az elrejtéssel.
+     */
+    const closeDeleteModal = () => {
+        
+        $('#deleteModal').modal('hide');
+
+    };
 
 </script>
 
 <template>
-    
     <Head :title="$t('roles')"/>
-
     <MainLayout>
         
         <!-- CONTENT HEADER -->
@@ -473,7 +487,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="Record in state.Records" 
+                                        <tr v-for="Record in rolesToTable.data" 
                                             :key="Record.id">
                                             <!-- checkbox a sor elején -->
                                             <td>
@@ -508,8 +522,8 @@
                             </div>
 
                             <div class="card-footer">
-                                <v-pagination v-model="state.pagination.current_page" 
-                                              :pages="state.pagination.total_number_of_pages"
+                                <v-pagination v-model="rolesToTable.current_page" 
+                                              :pages="rolesToTable.last_page"
                                               :range-size="state.pagination.range"
                                               active-color="#DCEDFF"
                                               @update:modelValue="getRecords"/>
@@ -573,30 +587,6 @@
                                     v-if="errors?.guard_name">{{ errors.guard_name[0] }}</div>
 
                             </div>
-
-                            <!-- PERMISSIONS -->
-                            <div class="form-group">
-                                <label>{{ $t('permissions') }}</label>
-                                <Select2 id="permissions" name="permissions" 
-                                         :options="permissionsToSelect"
-                                         :settings="{
-                                            width: '100%',
-                                            multiple: true,
-                                         }"
-                                ></Select2>
-                                <!--
-                                <Select2 class="form-control" 
-                                         v-model="myValue" 
-                                         :options="myOptions" 
-                                         :settings="{
-                                            settingOption: value, 
-                                            settingOption: value }" 
-                                            @change="myChangeEvent($event)" 
-                                            @select="mySelectEvent($event)" />
-                                <h4>Value: {{ myValue }}</h4>
-                                -->
-                            </div>
-
                         </div>
 
                     </div>

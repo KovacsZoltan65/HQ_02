@@ -76,14 +76,34 @@ Route::resource('/subdomains', \App\Http\Controllers\SubdomainController::class)
 // ROLES
 // ===============================
 // Szerepkörök lekérése táblázathoz
+// Összes szerepkör lekérése
 Route::get(
     '/getRoles', 
     [
         \App\Http\Controllers\Admin\RoleController::class, 
         'getRoles'
     ]
-)->name('getRoles');
-// Szerepkörök lekérése lenyílóhoz
+    )->name('getRoles');
+
+// Összes szerepkör táblázathoz
+Route::get(
+    '/getRolesToTable', 
+    [
+        \App\Http\Controllers\Admin\RoleController::class,  
+        'getRolesToTable'
+    ]
+)->name('getRolesToTable');
+
+// Jofosultság lekérése azonosító alapján
+Route::get(
+    '/getRoleById/{id}', 
+    [
+        \App\Http\Controllers\Admin\RoleController::class, 
+        'getRoleById'
+    ]
+)->name('getRoleById');
+
+// Jogosultságok lekérése lenyílóhoz
 Route::get(
     '/getRolesToSelect', 
     [
@@ -91,9 +111,14 @@ Route::get(
         'getRolesToSelect'
     ]
 )->name('getRolesToSelect');
-// Csoportos törlés
-Route::delete('/roles/{role}/bulkDelete', [\App\Http\Controllers\Admin\RoleController::class, 'bulkDelete'])->name('roles_bulkDelete');
 
+// Több szerepkör törlése
+Route::delete(
+    '/roles/{role}/bulkDelete', 
+    [\App\Http\Controllers\Admin\RoleController::class, 'bulkDelete']
+)->name('roles_bulkDelete');
+
+//
 Route::resource('/roles', \App\Http\Controllers\Admin\RoleController::class)->names([
       'index' => 'roles',
      'create' => 'roles_create',

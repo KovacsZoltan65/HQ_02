@@ -30,8 +30,7 @@ class PermissionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Inertia\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         return Inertia::render('Permissions/PermissionsList', [
             'can' => $this->_getRoles(),
         ]);
@@ -43,8 +42,7 @@ class PermissionController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getPermissionsToTable(Request $request)
-    {
+    public function getPermissionsToTable(Request $request) {
         // Szerezze be a konfigurációt és a szűrőket a kérésből
         $config = $request->input('config', []);
         $filters = $request->input('filters', []);
@@ -66,12 +64,15 @@ class PermissionController extends Controller
         $direction = $filters['direction'] ?? 'asc';
         
         // Rendelés alkalmazása a lekérdezésre
-        $this->repository->orderBy($column, $direction);
+        //$this->repository->orderBy($column, $direction);
         
         // Állítsa be az oldalankénti engedélyek számát
-        $per_page = $config['per_page'] ?? config('app.per_page');
+        //$per_page = $config['per_page'] ?? config('app.per_page');
         // Szerezze be az engedélyeket oldalszámozással
-        $permissions = Permission::query()->paginate($per_page);
+        //$permissions = Permission::query()->paginate($per_page);
+        $permissions = $this->repository
+            ->orderBy($column, $direction)
+            ->paginate( $config['per_page'] ?? config('app.per_page') );
         
         // Készítse elő a visszaküldendő adatokat
         $data = [
@@ -90,10 +91,11 @@ class PermissionController extends Controller
         return response()->json($permissions, Response::HTTP_OK);
     }
 
-    public function getPermissionById($id){
-        $permission = Permission::find($id);
+    public function getPermissionById($id) {
+        //$permission = Permission::find($id);
 
-        return response()->json($permission, Response::HTTP_OK);
+        //return response()->json($permission, Response::HTTP_OK);
+        return Permission::findOrFail($id);
     }
 
     /**
@@ -101,7 +103,7 @@ class PermissionController extends Controller
     *
     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     */
-    public function getPermissionsToSelect(){
+    public function getPermissionsToSelect() {
         return \App\Http\Resources\PermissionResource::collection(Permission::all());
     }
 
