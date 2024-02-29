@@ -1,15 +1,16 @@
 <script setup>
-    import { reactive, onMounted, ref, watch } from 'vue';
-    //import axios from 'axios';
+    import { reactive, onMounted, ref } from 'vue';
+    import axios from 'axios';
     import { Head, Link } from '@inertiajs/vue3';
+
     import MainLayout from '@/Layouts/MainLayout.vue';
     import VPagination from '@hennge/vue3-pagination';
     import '@hennge/vue3-pagination/dist/vue3-pagination.css';
-    import { trans } from 'laravel-vue-i18n';
-    import Swal from 'sweetalert2';
-    import 'sweetalert2/dist/sweetalert2.min.css';
 
-    const local_storage_column_key = 'ln_subdomains_grid_columns';
+    import { trans } from 'laravel-vue-i18n';
+
+    import { useToastr } from '@/toastr';
+    const toastr = useToastr();
 
     const props = defineProps({
         can: {
@@ -21,25 +22,6 @@
     const errors = ref({});
     const selectedRecords = ref([]);
     const selectAll = ref(false);
-
-    function newRecord () {
-        return {
-            id: 0,
-            subdomain: 'subdomain_01', 
-            url: 'http://subdomain_01.com', 
-            name: 'subdomain_01',
-            db_host: 'localhost', 
-            db_port: 4406, 
-            db_name: 'ej2_subdomain_p', 
-            db_user: 'ej2_subdomain_p', 
-            db_password: 'password',
-            notification: 1, 
-            state_id: 1, 
-            is_mirror: 0, 
-            sso: 0,
-            access_control_system: 0, 
-            last_export: ''};
-    };
 
     const state = reactive({
         Records: [],
@@ -74,98 +56,251 @@
         },
 
         subdomain_states: [
-            {id: 1,name: 'Aktív'},
-            {id: 2,name: 'Felfüggesztve'},
-            {id: 3,name: 'Leállítva(HQ)'},
-            {id: 4,name: 'Leállítva(példány)'}
+            {
+                id: 1,
+                name: 'Aktív'
+            },
+            {
+                id: 2,
+                name: 'Felfüggesztve'
+            },
+            {
+                id: 3,
+                name: 'Leállítva(HQ)'
+            },
+            {
+                id: 4,
+                name: 'Leállítva(példány)'
+            }
         ],
         access_control_systems: [
-            {id: 0,name: 'Nincs'},
-            {id: 1,name: 'WinAccess'},
-            {id: 2,name: 'Enviromux'},
-            {id: 3,name: 'Siport'},
-            {id: 4,name: 'WinAccess WC'},
-            {id: 5,name: 'GenerallyACS'}
+            {
+                id: 0,
+                name: 'Nincs'
+            },{
+                id: 1,
+                name: 'WinAccess'
+            },
+            {
+                id: 2,
+                name: 'Enviromux'
+            },
+            {
+                id: 3,
+                name: 'Siport'
+            },
+            {
+                id: 4,
+                name: 'WinAccess WC'
+            },
+            {
+                id: 5,
+                name: 'GenerallyACS'
+            }
         ],
     });
 
-    // ===================================
-    // NEW RECORD
-    // ===================================
+
+    // =====================
+    // JELSZÓ GENERÁLÁS
+    // =====================
+    const genPassword = () => {
+        axios.post(route('generatePassword'), {
+            minLength: 5,
+            maxLength: 10
+        })
+        .then(response => {
+            //console.log(response.data);
+            state.editingRecord.db_password = response.data;
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    };
+
+    // =====================
+    // ÚJ REKORD
+    // =====================
+    function newRecord() {
+        return {
+            id: 0,
+            subdomain: 'subdomain_01', 
+            url: 'http://subdomain_01.com', 
+            name: 'subdomain_01',
+            db_host: 'localhost', 
+            db_port: 4406, 
+            db_name: 'ej2_subdomain_p', 
+            db_user: 'ej2_subdomain_p', 
+            db_password: 'password',
+            notification: 1, 
+            state_id: 1, 
+            is_mirror: 0, 
+            sso: 0,
+            access_control_system: 0, 
+            last_export: ''
+        };
+    };
+    // Új rekord előkészítése
     const newRecord_init = () => {
         cancelEdit();
         state.isEdit = false;
 
         openEditModal();
     };
-
+    // Új rekord mentése
     const createRecord = () => {
+        console.log('createRecord', state.Record);
         errors.value = '';
 
-        subdomainCreate(state.Record);
+        axios.post(route('subdomains'), state.Record)
+        .then(resource => {
+            console.log(resource);
+            closeEditModal();
+        })
+        .catch(error => {
+            console.log(error);
+        });
     };
 
-
-    // ===================================
-    // EDIT RECORD
-    // ===================================
+    // =====================
+    // SZERKESZTÉS
+    // =====================
     const editRecord = (record) => {
         state.editingRecord = record;
-        state.isEditModal = true;
+        state.isEdit = true;
 
         openEditModal();
     };
+    // Szerkesztett adatok mentése
+    const updateRecord = () => {
+        errors.value = '';
 
-    const updateRecord = () => {};
+        axios.put(route('subdomains_update', {subdomain: state.editingRecord.id}), {
+            id: state.editingRecord.id,
+            subdomain: state.editingRecord.subdomain,
+            url: state.editingRecord.url,
+            name: state.editingRecord.name,
+            db_host: state.editingRecord.db_host,
+            db_port: state.editingRecord.db_port,
+            db_name: state.editingRecord.db_name,
+            db_user: state.editingRecord.db_user,
+            db_password: state.editingRecord.db_password,
+            notification: state.editingRecord.notification,
+            state_id: state.editingRecord.state_id,
+            is_mirror: state.editingRecord.is_mirror,
+            sso: state.editingRecord.sso,
+            access_control_system: state.editingRecord.access_control_system,
+            last_export: state.editingRecord.last_export
+        })
+        .then(response => {
+            cancelEdit();
+            closeEditModal();
 
-    const cancelEdit = () => {};
+            toastr.success(trans('subdomains_updated'));
+            //toastr.success('ASDASDAS');
+        })
+        .catch(error => {
+            console.log('error', error);
+            //errors.value = error.response.data.errors;
+        });
+    };
+    // Szerkesztés megszakítása
+    const cancelEdit = () => {
+        state.editRecord = newRecord();
+        state.isEdit = false;
+    };
 
-    // ===================================
-    // DELETE RECORD
-    // ===================================
+    // =====================
+    // REKORD(OK) TÖRLÉSE
+    // =====================
+    // Törlés megerősítése
     const confirmDelete = (record) => {
         state.deletingRecord = record;
         openDeleteModal();
     };
+    // Rekord törlése
+    const deleteRecord = () => {
+        axios.delete(`/subdomains/${state.deletingRecord.id}`)
+        .then(response => {
+            closeDeleteModal();
+            state.Records = state.Records.filter(record => record.id !== state.deletingRecord.id);
 
-    const deleteRecord = (record) => {
-        response = subdomainDelete(record.id);
+            toastr.success(trans('subdomains_deleted'));
+        })
+        .catch(error => console.log(error));
     };
-
+    // Kijelölt rekordok törlése
     const bulkDelete = () => {
-        response = subdomainBulkDelete(selectedRecords.value);
-        console.log('bulkDelete response', response);
+        //console.log('bulkDelete', selectedRecords.value);
+        axios.delete(route(''), {})
+        .then(resource => {
+            state.Records = state.Records.filter(s => !selectedRecords.value.includes(s.id) );
+            selectedRecords.value = [];
+            selectAll.value = false;
+            toastr.success(trans('subdomains_bulk_deleted'));
+        })
+        .catch(error => {
+            //
+        });
     };
-
+    // Törlés megszakítása
     const cancelDelete = () => {
         state.deletingRecord = newRecord();
         closeDeleteModal();
     };
 
-    // ===================================
+    // =====================
+    // ADATLEKÉRÉS
+    // =====================
+    const getRecords = async (page = state.pagination.current_page) => {
+        axios.get(route('getSubdomains', {
+            filters: state.filter,
+            config: {
+                per_page: state.pagination.per_page,
+            }, page
+        })).then(response => {
+            state.Records = response.data.subdomains.data;
+            selectedRecords.value = [];
+            selectAll.value = false;
+
+            state.pagination.total_number_of_pages = response.data.subdomains.last;
+            state.pagination.current_page = response.data.subdomains.current_page;
+        }).catch(error => {
+            console.log('getRecords error', error);
+        });
+    };
+
+    // =====================
     // KIJELÖLÉS
-    // ===================================
+    // =====================
+    // Összes rekord kijelölése
     const selectAllRecord = () => {
-        if( selectAll.value ) {
+        if( selectAll.value ){
             selectedRecords.value = state.Records.map(record => record.id);
-        } else {
+        }else{
             selectedRecords.value = [];
         }
     };
-
+    // Rekord jelölés váltása
     const toggleSelection = (id) => {
+
         const index = selectedRecords.value.indexOf(id);
 
-        if( index === -1 ){
+        if( index === -1 ) {
             selectedRecords.value.push(id);
         } else {
             selectedRecords.value.splice(index, 1);
         }
     };
 
+    onMounted(() => {
+        getRecords();
+    });
+
     // =====================
     // MODAL KEZELÉS
     // =====================
+    // beállítások
     function openSettingsModal() {
         $('#settingsModal').modal('show');
     };
@@ -188,46 +323,12 @@
     function closeDeleteModal() {
         $('#deleteModal').modal('hide');
     };
-
-    // ===================================
-    // Services
-    // ===================================
-    import useRoles from '@/services/subdomains.js';
-    const {
-        subdomains, subdomainsToSelect, subdomainsToTable, subdomain, 
-        getSubdomains, getSubdomainsToTable, getSubdomainsToSelect, getSubdomainById, password,
-        subdomainCreate, subdomainUpdate, genPassword,
-        subdomainDelete, subdomainBulkDelete, subdomainRestore
-
-    } = useRoles();
-
-    const getRecords = async (page = state.pagination.current_page) => {
-        /**
-         * Retrieve subdomains with specified filters and pagination configuration
-         * @param {Object} filters - The filters to apply
-         * @param {Object} config - The pagination configuration
-         * @param {number} page - The page number to retrieve
-         */
-        await getSubdomainsToTable({
-            filters: state.filter, 
-            config: {
-                per_page: state.pagination.per_page
-            },
-            page
-        });
-    };
-
-    onMounted(() => {
-        getRecords();
-    });
-
 </script>
 
 <template>
+    <Head :title="$t('subdomains')"/>
 
-    <Head :title="$t('subdomains')" />
     <MainLayout>
-
         <!-- CONTENT HEADER -->
         <div class="content-header">
             <div class="container-fluid">
@@ -247,7 +348,6 @@
                             <li class="breadcrumb-item active">{{ $t('subdomains') }}</li>
                         </ol>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -277,11 +377,6 @@
                                 <i class="fas fa-sync"></i>
                             </button>
 
-                            <!-- SETTUNGS -->
-                            <button typw="button" 
-                                    class="btn btn-primary" @click="settings_init()"
-                            >{{ $t('settings') }}</button>
-
                             <!-- BULK DELETE -->
                             <div v-if="selectedRecords.length > 0">
                                 <button type="button"
@@ -296,12 +391,12 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-lg-12">
+
                         <div class="card">
-
+                            
                             <div class="card-header">
-                                <h5 class="card-title">{{ $t('permissions') }}</h5>
-
+                                <h5 class="card-title">{{ $t('subdomains') }}</h5>
                                 <div class="card-tools">
                                     <!-- KERESÉS -->
                                     <div class="input-group input-group-sm">
@@ -319,87 +414,77 @@
                             </div>
 
                             <div class="card-body">
-                                <!-- TÁBLA -->
+                                <!-- TÁBLÁZAT -->
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <!-- checkbox a fejlécben -->
-                                            <th>chk</th>
+                                            <th>
+                                                <!-- checkbox a fejlécben -->
+                                                <input type="checkbox" 
+                                                       v-model="selectAll"
+                                                       @change="selectAllRecord()"/>
+                                            </th>
 
-                                            <!-- HEAD -->
-                                            <th v-for="(key, value) in state.columns" 
-                                                :key="key" 
-                                                v-show="key.is_visible">
+                                            <th v-for="(key, value) in state.columns">
                                                 {{ $t(value) }}
                                             </th>
-                                            
-                                            <!-- ACTIONS -->
-                                            <th>{{ $t('actions') }}</th>
 
+                                            <th>{{ $t('actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="Record in subdomainsToTable.data" 
-                                            :key="Record.id">
-
-                                            <!-- checkbox a sor elején -->
+                                        <tr v-for="Record in state.Records">
                                             <td>
-                                                <!-- CHECKBOX -->
+                                                <!-- checkbox a sor elején -->
                                                 <input type="checkbox" 
-                                                       :checked="selectAll" 
+                                                       :checked="selectAll"
                                                        @change="toggleSelection(Record.id)"/>
                                             </td>
-
-                                            <!-- FIELDS -->
-                                            <td v-for="(key, value) in state.columns" 
-                                                :key="key" 
-                                                v-show="key.is_visible">
+                                            
+                                            <td v-for="(key, value) in state.columns">
                                                 {{ Record[value] }}
                                             </td>
-
-                                            <!-- ACTIONS -->
+                                            
                                             <td>
                                                 <div class="bd-example">
-                                                    
-                                                    <!-- SZERKESZTÉS -->
                                                     <button type="button" 
-                                                            class="btn btn-primary" 
+                                                            class="btn btn-primary"
                                                             @click="editRecord(Record)">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
-
-                                                    <!-- TÖRLÉS -->
                                                     <button type="button" 
-                                                            class="btn btn-danger" 
+                                                            class="btn btn-danger"
                                                             @click="confirmDelete(Record)">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
-
                                                 </div>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                            <!-- /táblázat -->
 
+                            <!-- footer -->
                             <div class="card-footer">
-                                <v-pagination v-model="subdomainsToTable.current_page" 
-                                              :pages="subdomainsToTable.last_page"
+                                <v-pagination v-model="state.pagination.current_page" 
+                                              :pages="state.pagination.total_number_of_pages"
                                               :range-size="state.pagination.range"
                                               active-color="#DCEDFF"
                                               @update:modelValue="getRecords"/>
                             </div>
+                            <!-- /footer -->
                         </div>
+                        <!-- /card -->
                     </div>
                 </div>
 
             </div>
+
         </div>
 
-    </MainLayout>
-
-    <!-- EDIT MODAL -->
-    <div class="modal fade" id="editModal" 
+        <!-- EDIT MODAL -->
+        <div class="modal fade" id="editModal" 
              data-backdrop="static" 
              tabindex="-1" role="dialog" 
              aria-labelledby="staticBackdropLabel" 
@@ -650,59 +735,60 @@
             </div>
         </div>
 
-    <!-- DELETE MODAL -->
-    <div class="modal fade" id="deleteModal" 
-         data-backdrop="static" 
-         tabindex="-1" role="dialog" 
-         aria-labelledby="staticBackdropLabel" 
-         aria-hidden="true"
-         :show="state.showDeleteModal">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
+        <!-- DELETE MODAL -->
+        <div class="modal fade" id="deleteModal" 
+             data-backdrop="static" 
+             tabindex="-1" role="dialog" 
+             aria-labelledby="staticBackdropLabel" 
+             aria-hidden="true"
+             :show="state.showDeleteModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
 
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">
-                        <span>{{ $t('subdomains_delete') }}</span>
-                    </h5>
-                    <button type="button" class="close" 
-                            data-dismiss="modal" 
-                            aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">
+                            <span>{{ $t('subdomains_delete') }}</span>
+                        </h5>
+                        <button type="button" class="close" 
+                                data-dismiss="modal" 
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
 
-                <div class="modal-body">
-                    <h5>{{ $t('subdomains_delete_confirmation') }}</h5>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" 
-                            class="btn btn-secondary"
-                            @click="cancelDelete()">{{ $t('cancel') }}</button>
-                    <button type="submit" 
-                            @click="deleteRecord()"  
-                            class="btn btn-primary"
-                    >{{ state.isEdit ? $t('update') : $t('delete') }}</button>
-                </div>
+                    <div class="modal-body">
+                        <h5>{{ $t('subdomains_delete_confirmation') }}</h5>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" 
+                                class="btn btn-secondary"
+                                @click="cancelDelete()">{{ $t('cancel') }}</button>
+                        <button type="submit" 
+                                @click="deleteRecord()"  
+                                class="btn btn-primary"
+                        >{{ state.isEdit ? $t('update') : $t('delete') }}</button>
+                    </div>
 
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- SETTINGS MODAL -->
-    <div class="modal fade" id="settingsModal" 
-         data-backdrop="static" 
-         tabindex="-1" role="dialog" 
-         aria-labelledby="staticBackdropLabel" 
-         aria-hidden="true"
-         :show="state.showSettingsModal">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header"></div>
-                <div class="modal-body"></div>
-                <div class="modal-footer"></div>
+        <!-- SETTINGS MODAL -->
+        <div class="modal fade" id="settingsModal" 
+             data-backdrop="static" 
+             tabindex="-1" role="dialog" 
+             aria-labelledby="staticBackdropLabel" 
+             aria-hidden="true"
+             :show="state.showSettingsModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header"></div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer"></div>
+                </div>
             </div>
         </div>
-    </div>
 
+    </MainLayout>
 </template>
