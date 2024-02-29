@@ -11,6 +11,10 @@
 
     const local_storage_column_key = 'ln_subdomains_grid_columns';
 
+    watch(state.columns, (new_value, old_value) => {
+        localStorage.setItem(local_storage_column_key, JSON.stringify(new_value));
+    });
+
     const props = defineProps({
         can: {
             type: Object,
@@ -22,6 +26,11 @@
     const selectedRecords = ref([]);
     const selectAll = ref(false);
 
+    /**
+     * Creates and returns a new record object with default values.
+     *
+     * @return {Object} The new record object
+     */
     function newRecord () {
         return {
             id: 0,
@@ -93,12 +102,18 @@
     // NEW RECORD
     // ===================================
     const newRecord_init = () => {
+        // szerkesztés megszakítása
         cancelEdit();
         state.isEdit = false;
 
         openEditModal();
     };
 
+    /**
+     * Function to create a record.
+     *
+     * @return {void} No return value
+     */
     const createRecord = () => {
         errors.value = '';
 
@@ -109,32 +124,79 @@
     // ===================================
     // EDIT RECORD
     // ===================================
+    
+    /**
+     * Edit a record.
+     *
+     * @param {object} record - the record to be edited
+     *
+     * @return {void}
+     */
     const editRecord = (record) => {
+        // set the record to be edited
         state.editingRecord = record;
-        state.isEditModal = true;
 
+        // open the edit modal
         openEditModal();
     };
 
-    const updateRecord = () => {};
+    /**
+     * A function that updates a record.
+     *
+     * @param {void} -
+     * @return {void} -
+     */
+    const updateRecord = () => {
+        subdomainCreate(state.editingRecord);
+    };
 
-    const cancelEdit = () => {};
+    /**
+     * Cancel the edit.
+     *
+     * @return {void}
+     */
+    const cancelEdit = () => {
+        // reset the editable object
+        state.editingRecord = newRecord();
+        // false = new
+        state.isEdit = false;
+    };
 
     // ===================================
     // DELETE RECORD
     // ===================================
+    
+    /**
+     * Open the delete modal with the given record.
+     *
+     * @param {object} record - the record to be deleted
+     *
+     * @return {void}
+     */
     const confirmDelete = (record) => {
         state.deletingRecord = record;
         openDeleteModal();
     };
 
+    /**
+     * Delete a record.
+     *
+     * @param {object} record - the record to be deleted
+     *
+     * @return {void}
+     */
     const deleteRecord = (record) => {
         response = subdomainDelete(record.id);
     };
 
+    /**
+     * Több rekord törlése
+     *
+     * @return {void}
+     */
     const bulkDelete = () => {
         response = subdomainBulkDelete(selectedRecords.value);
-        console.log('bulkDelete response', response);
+        //console.log('bulkDelete response', response);
     };
 
     const cancelDelete = () => {
@@ -145,20 +207,38 @@
     // ===================================
     // KIJELÖLÉS
     // ===================================
+    
+    /**
+     * Select all records.
+     *
+     * @return {void}
+     */
     const selectAllRecord = () => {
+        // if select all is checked
         if( selectAll.value ) {
+            // összes rekord kiválasztása
             selectedRecords.value = state.Records.map(record => record.id);
         } else {
+            // összes kiválasztás megszüntetése
             selectedRecords.value = [];
         }
-    };
+    }; 
 
+    /**
+     * Select or unselect record.
+     *
+     * @param {int} id - Record ID
+     * @return {void}
+     */
     const toggleSelection = (id) => {
         const index = selectedRecords.value.indexOf(id);
 
-        if( index === -1 ){
+        // Ha a rekord nincs kiválasztva,,
+        if( index === -1 ) {
+            // add it to selected records,
             selectedRecords.value.push(id);
         } else {
+            // else remove it from selected records
             selectedRecords.value.splice(index, 1);
         }
     };
@@ -166,25 +246,60 @@
     // =====================
     // MODAL KEZELÉS
     // =====================
+    
+    /**
+     * Megnyitja a beállítások modalt
+     *
+     * @return {void}
+     */
     function openSettingsModal() {
         $('#settingsModal').modal('show');
     };
+
+    /**
+     * Bezárja a beállítások modalt
+     *
+     * @return {void}
+     */
     function closeSettingsModal() {
         $('#settingsModal').modal('hide');
     };
-    // szerkesztés
+
+    
+    /**
+     * Megnyitja a szerkesztés modalt
+     *
+     * @return {void}
+     */
     function openEditModal() {
         $('#editModal').modal('show');
     };
+    
+    /**
+     * Bezárja a szerkesztés modalt
+     *
+     * @return {void}
+     */
     function closeEditModal() {
         cancelEdit();
 
         $('#editModal').modal('hide');
     };
-    // törlés
+
+    /**
+     * Megnyitja a törlés modalt
+     *
+     * @return {void}
+     */
     function openDeleteModal() {
         $('#deleteModal').modal('show');
     };
+    
+    /**
+     * Bezárja a törlés modalt
+     *
+     * @return {void}
+     */
     function closeDeleteModal() {
         $('#deleteModal').modal('hide');
     };
@@ -192,7 +307,9 @@
     // ===================================
     // Services
     // ===================================
+    
     import useRoles from '@/services/subdomains.js';
+    
     const {
         subdomains, subdomainsToSelect, subdomainsToTable, subdomain, 
         getSubdomains, getSubdomainsToTable, getSubdomainsToSelect, getSubdomainById, password,
@@ -201,13 +318,14 @@
 
     } = useRoles();
 
+    /**
+     * Retrieve subdomains with specified filters and pagination configuration
+     *
+     * @param {Object} filters - The filters to apply
+     * @param {Object} config - The pagination configuration
+     * @param {number} page - The page number to retrieve
+     */
     const getRecords = async (page = state.pagination.current_page) => {
-        /**
-         * Retrieve subdomains with specified filters and pagination configuration
-         * @param {Object} filters - The filters to apply
-         * @param {Object} config - The pagination configuration
-         * @param {number} page - The page number to retrieve
-         */
         await getSubdomainsToTable({
             filters: state.filter, 
             config: {
@@ -218,6 +336,15 @@
     };
 
     onMounted(() => {
+
+        let columns = localStorage.getItem(local_storage_column_key);
+        if( columns ) {
+            columns = JSON.parse(columns);
+            for( const column_name in columns ) {
+                state.columns[column_name].is_visible = columns[column_name];
+            }
+        }
+
         getRecords();
     });
 
@@ -277,7 +404,7 @@
                                 <i class="fas fa-sync"></i>
                             </button>
 
-                            <!-- SETTUNGS -->
+                            <!-- SETTINGS -->
                             <button typw="button" 
                                     class="btn btn-primary" @click="settings_init()"
                             >{{ $t('settings') }}</button>
