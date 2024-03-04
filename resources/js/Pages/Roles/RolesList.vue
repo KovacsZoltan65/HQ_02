@@ -1,7 +1,7 @@
 <script setup>
     import { reactive, onMounted, ref, watch } from 'vue';
     import axios from 'axios';
-    import { InertiaProgress } from '@inertiajs/progress';
+
     import { Head, Link } from '@inertiajs/vue3';
     import MainLayout from '@/Layouts/MainLayout.vue';
     import VPagination from '@hennge/vue3-pagination';
@@ -19,23 +19,6 @@
         }
     });
 
-    // ===================================
-    // Progress
-    // ===================================
-    InertiaProgress.init({
-        // The delay after which the progress bar will appear, in milliseconds...
-        delay: 250,
-
-        // The color of the progress bar...
-        color: '#29d',
-
-        // Whether to include the default NProgress styles...
-        includeCSS: true,
-
-        // Whether the NProgress spinner will be shown...
-        showSpinner: true,
-    });
-
     const errors = ref({});
     const selectedRecords = ref([]);
     const selectAll = ref(false);
@@ -51,23 +34,8 @@
         roleDelete, roleBulkDelete, roleRestore
 
     } = useRoles();
-
-    // ===================================
-    // Progress
-    // ===================================
-    InertiaProgress.init({
-        // The delay after which the progress bar will appear, in milliseconds...
-        delay: 250,
-
-        // The color of the progress bar...
-        color: '#29d',
-
-        // Whether to include the default NProgress styles...
-        includeCSS: true,
-
-        // Whether the NProgress spinner will be shown...
-        showSpinner: true,
-    });
+    import usePermissions from '@/services/permissions.js';
+    const {getPermissionsToSelect, permissionsToSelect} = usePermissions();
 
     // Általános alert
     const alerta = Swal.mixin({
@@ -88,6 +56,7 @@
     const state = reactive({
         Records: [],
         Record: newRecord(),
+        Subdomains: [],
 
         editingRecord: newRecord(),
         deletingRecord: newRecord(),
@@ -302,6 +271,11 @@
         });
     };
 
+    const getPermissions = () => {
+        getPermissionsToSelect();
+        state.Subdomains = permissionsToSelect;
+    };
+
     onMounted(() => {
         
         let columns = localStorage.getItem(local_storage_column_key);
@@ -311,6 +285,7 @@
                 state.columns[column_name] = columns[column_name];
             }
         }
+        getPermissions();
 
         getRecords();
     });

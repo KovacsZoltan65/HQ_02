@@ -1,7 +1,6 @@
 <script setup>
     import { reactive, onMounted, ref, watch } from 'vue';
     import axios from 'axios';
-    import { InertiaProgress } from '@inertiajs/progress';
     import { Head, Link } from '@inertiajs/vue3';
     import MainLayout from '@/Layouts/MainLayout.vue';
     import VPagination from '@hennge/vue3-pagination';
@@ -19,23 +18,6 @@
         }
     });
 
-    // ===================================
-    // Progress
-    // ===================================
-    InertiaProgress.init({
-        // The delay after which the progress bar will appear, in milliseconds...
-        delay: 250,
-
-        // The color of the progress bar...
-        color: '#29d',
-
-        // Whether to include the default NProgress styles...
-        includeCSS: true,
-
-        // Whether the NProgress spinner will be shown...
-        showSpinner: true,
-    });
-
     const errors = ref({});
     const selectedRecords = ref([]);
     const selectAll = ref(false);
@@ -51,23 +33,6 @@
         permissionDelete, permissionBulkDelete, permissionRestore
 
     } = usePermissions();
-
-    // ===================================
-    // Progress
-    // ===================================
-    InertiaProgress.init({
-        // The delay after which the progress bar will appear, in milliseconds...
-        delay: 250,
-
-        // The color of the progress bar...
-        color: '#29d',
-
-        // Whether to include the default NProgress styles...
-        includeCSS: true,
-
-        // Whether the NProgress spinner will be shown...
-        showSpinner: true,
-    });
 
     // Általános alert
     const alerta = Swal.mixin({
@@ -124,18 +89,33 @@
     // =====================
     // ÚJ REKORD
     // =====================
+    
+    /**
+     * Új rekord inicializálása a folyamatban lévő szerkesztések törlésével 
+     * és a szerkesztési ablak megnyitásával.
+     */
     const newRecord_init = () => {
-        
+        // Szerkesztés megszakítása
         cancelEdit();
+
+        // Szerkesztő ablak megnyitása
         openEditModal();
 
     };
     
     /**
-     * Create a new record using the provided data
+     * Hozzon létre egy új rekordot a megadott adatok felhasználásával
      */
     const createRecord = async () => {
-        //console.log('state.Record', state.editingRecord);
+        let result = permissionCreate(state.editingRecord);
+
+        if( result ){
+            cancelEdit();
+            closeEditModal();
+
+            alerta.fire(trans('permissions_created'), '', 'info');
+        }
+        /*
         try{
             permissionCreate(state.editingRecord);
 
@@ -145,20 +125,21 @@
         }catch(error){
             console.error('permissions createRecord', error);
         }
+        */
     };
 
     /**
-     * Edit a record
-     * @param {Object} record - The record to be edited
+     * Rekord szerkesztése
+     * @param {Object} record - A szerkesztendő rekord
      */
     const editRecord = (record) => {
-        // Set the record to be edited
+        // Állítsa be a szerkesztendő rekordot
         state.editingRecord = record;
 
-        // Set the edit mode to true
+        // Állítsa be a szerkesztendő rekordot
         state.isEdit = true;
 
-        // Open the edit modal
+        // Nyissa meg a szerkesztési ablakot
         openEditModal();
     };
     
@@ -166,7 +147,15 @@
      * Update a record and handle the response
      */
     const updateRecord = async () => {
+        let result = permissionUpdate(state.editingRecord);
 
+        if( result ){
+            cancelEdit();
+            closeEditModal();
+
+            alerta.fire(trans('permissions_created'), '', 'info');
+        }
+        /*
         let result = permissionUpdate({permission: state.editingRecord.id}, {
             id: state.editingRecord.id,
             name: state.editingRecord.name,
@@ -179,15 +168,17 @@
 
             alerta.fire(trans('permissions_updated'), '', 'info');
         }
+        */
     };
 
     /**
-     * Cancels the edit mode and resets the editing record to a new record.
+     * Megszakítja a szerkesztési módot, 
+     * és visszaállítja a szerkesztési rekordot egy új rekordra.
      */
     const cancelEdit = () => {
-        // Reset the editing record to a new record
+        // Állítsa vissza a szerkesztési rekordot egy új rekordra
         state.editingRecord = { ...newRecord() };
-        // Set edit mode to false
+        // A szerkesztési módot állítsa false értékre
         state.isEdit = false;
     };
 

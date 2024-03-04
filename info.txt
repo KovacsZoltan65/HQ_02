@@ -72,6 +72,8 @@ https://fontawesome.com/search?q=trash&o=r&m=free&s=solid&f=sharp%2Cclassic
 https://inertiajs.com/progress-indicators
 npm install @inertiajs/progress
 
+npm install nprogress
+
 ======================
 = HELPER
 ======================

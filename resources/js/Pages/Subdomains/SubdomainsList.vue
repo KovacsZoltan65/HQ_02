@@ -11,10 +11,6 @@
 
     const local_storage_column_key = 'ln_subdomains_grid_columns';
 
-    watch(state.columns, (new_value, old_value) => {
-        localStorage.setItem(local_storage_column_key, JSON.stringify(new_value));
-    });
-
     const props = defineProps({
         can: {
             type: Object,
@@ -96,6 +92,10 @@
             {id: 4,name: 'WinAccess WC'},
             {id: 5,name: 'GenerallyACS'}
         ],
+    });
+
+    watch(state.columns, (new_value, old_value) => {
+        localStorage.setItem(local_storage_column_key, JSON.stringify(new_value));
     });
 
     // ===================================
@@ -325,7 +325,7 @@
      * @param {Object} config - The pagination configuration
      * @param {number} page - The page number to retrieve
      */
-    const getRecords = async (page = state.pagination.current_page) => {
+     const getRecords = async (page = state.pagination.current_page) => {
         await getSubdomainsToTable({
             filters: state.filter, 
             config: {
@@ -334,6 +334,18 @@
             page
         });
     };
+    
+   /*
+    const getRecords = (page = state.pagination.current_page) => {
+        getSubdomainsToTable({
+            filters: state.filter, 
+            config: {
+                per_page: state.pagination.per_page
+            },
+            page
+        });
+    };
+    */
 
     onMounted(() => {
 

@@ -18,16 +18,13 @@ export default function usePermissions(){
      */
     const permission = ref({});
 
-    /**
-     * Fetches permissions from the server and updates permissions.value
-     */
     const getPermissionsToTable = async (conf) => {
         try {
             /**
              * Make a GET request to the 'getPermissions' route
              */
             let response = await axios.get(route('getPermissionsToTable', conf));
-            //console.log('getPermissionsToTable', response);
+            
             /**
              * Update permissions.value with the response data
              */
@@ -54,10 +51,10 @@ export default function usePermissions(){
      * Jogosultság lekérése azonosító alapján
      */
     const getPermissionById = (id) => {
-        try{
+        try {
             let response = axios.get(route('getPermissionById'), id);
             permission.value = response.data.data;
-        }catch(error){
+        } catch(error) {
             console.error('Error getPermission:', error);
         }
     };
@@ -78,17 +75,17 @@ export default function usePermissions(){
     };
 
     /**
-     * Asynchronously creates a new permission record.
-     * @param {object} record - The permission record to be created.
+     * Aszinkron módon létrehoz egy új engedélyrekordot.
+     * @param {object} record - A létrehozandó engedélyrekord.
      */
     const permissionCreate = async (record) => {
         try {
             // Destructure the 'data' property from the response
             const { data } = await axios.post(route('permissions'), record);
-            // Return the 'data' property directly
+            // Közvetlenül adja vissza az „adat” tulajdonságot
             return data;
         } catch (error) {
-            // Log any errors that occur during the creation process
+            // Naplózza a létrehozási folyamat során előforduló hibákat
             console.error('permissionCreate error', error);
         }
     };
