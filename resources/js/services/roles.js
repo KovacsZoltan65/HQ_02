@@ -24,34 +24,33 @@ export default function useRoles(){
      * Fetches roles from the server and updates roles.value
      */
     const getRolesToTable = async (conf) => {
-        await axios.get(route('getRolesToTable', conf))
-            .then(res => {
-                rolesToTable.value = res.data.data;
-            })
-            .catch(error => console.error('getRolesToTable error', error));
+        await axios.get(
+            route('getRolesToTable', conf)
+        ).then(res => { 
+            rolesToTable.value = res.data.data; 
+        }).catch(error => console.error('getRolesToTable error', error));
     };
 
     /**
      * Lekérem az összes jogosultságot (gyorsabb verzió)
      */
     const getRoles = async () => {
-        await axios.get( route('getAllRoles') )
-        .then(res => {
-            roles.value = res.data.data;
-        })
-        .catch(error => console.error('Error getRoles:', error));
+        await axios.get(
+            route('getAllRoles')
+        ).then(
+            res => { roles.value = res.data.data; }
+        ).catch( error => console.error('Error getRoles:', error) );
     };
     
     /**
      * Jogosultság lekérése azonosító alapján
      */
-    const getRoleById = (id) => {
-        try{
-            const { res } = axios.get(route('getRoleById'), id);
-            role.value = res.data.data;
-        }catch(error){
-            console.error('Error getRole:', error);
-        }
+    const getRoleById = async (id) => {
+        await axios.get(
+            route('getRoleById'), id
+        ).then(
+            res => { role.value = res.data.data; }
+        ).catch( error => console.error('Error getRoleById:', error) );
     };
 
     /**
@@ -59,15 +58,13 @@ export default function useRoles(){
      * és frissíti a szerepkörök kiválasztásához a letöltött adatokkal
      */
     const getRolesToSelect = async () => {
-        try {
-            // Kérelem küldése a szervernek a szerepkörök lekéréséhez
-            const { res } = await axios.get( route('getRolesToSelect') );
-
-            // Frissítse a szerepköröket a lekért adatokkal való kiválasztáshoz
-            rolesToSelect.value = res.data.data;
-        } catch (error) {
-            console.error('Error retrieving roles:', error);
-        }
+        await axios.get(
+            route('getRolesToSelect')
+        ).then(
+            res => {rolesToSelect.value = res.data.data;}
+        ).catch(
+            error => console.error('Error getRolesToSelect:', error)
+        );
     };
 
     /**
@@ -75,12 +72,13 @@ export default function useRoles(){
      * @param {object} record - A létrehozandó szereprekord.
      */
     const roleCreate = async (record) => {
-        try {
-            const { res } = await axios.post(route('roles'), record);
-            response.value = res;
-        } catch (error) {
-            console.error('roleCreate error', error);
-        }
+        await axios.post(
+            route('roles'), record
+        ).then(
+            res => { response.value = res.data.data; }
+        ).catch(
+            error => console.error('roleCreate error', error)
+        );
     };
 
     /**
@@ -89,15 +87,13 @@ export default function useRoles(){
      * @param {number} id - A szereprekord azonosítója
      */
     const roleUpdate = async (id, record) => {
-
-        try {
-            const { res } = await axios.put(route('roles_update', id), record);
-            
-            response.value = res;
-        } catch (error) {
-            // Naplózza a szerepkör frissítés során fellépő hibákat
-            console.error('roleUpdate error', error);
-        }
+        await axios.put(
+            route('roles_update', id), record
+        ).then(
+            res => { response.value = res.data.data; }
+        ).catch(
+            error => console.error('roleUpdate error', error)
+        );
     };
 
     /**
@@ -106,34 +102,40 @@ export default function useRoles(){
      * @returns {Promise} - The result of the role deletion
      */
     const roleDelete = async (id) => {
-        try {
-            // Törlési kérelem küldése a kiszolgáló felé
-            const { res } = await axios.delete(`/roles/${id}`);
-            response.value = res;
-        } catch (error) {
-            // Naplózza a szerepkör törlése során fellépő hibákat
-            console.error('roleDelete error', error);
-        }
+        await axios.delete(
+            route('roles_delete', id)
+        ).then(
+            res => { response.value = res.data.data; }
+        ).catch(
+            error => console.error('roleDelete error', error)
+        );
     };
 
-    const roleBulkDelete = async (ids) => axios.delete('roles_bulkDelete', { params: { ids } })
-        .then(({ data }) => response.value = data)
-        .catch(error => console.error('roleBulkDelete error', error));
-
+    /**
+     * Bulk delete roles.
+     *
+     * @param {array} ids - The array of role IDs to be deleted
+     * @return {Promise} A Promise that resolves with the response data or rejects with an error
+     */
+    const roleBulkDelete = async (ids) => {
+        await axios.delete('roles_bulkDelete', { params: { ids } }
+        ).then(
+            res => { response.value = res.data.data; }
+        ).catch(
+            error => console.error('roleBulkDelete error', error)
+        );
+    }
 
     /**
      * Szerepkör visszaállítása
      * @param {number} id - Visszaállítandó szerepkör azonosítója
      */
     const roleRestore = async (id) => {
-        try {
-            // Send a POST request to restore the role
-            const { res } = await axios.post(route('role_restore'), {data: {id: id}});
-            response.value = res;
-        } catch (error) {
-            // Log any errors that occur during the role restore process
-            console.error('roleRestore error', error);
-        }
+        await axios.post(
+            //
+        ).then(
+            res => { response.value = res.data.data; }
+        ).catch(error => console.error('Error roleRestore:', error));
     };
 
     return {
