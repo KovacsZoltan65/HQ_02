@@ -262,6 +262,7 @@
          * @param {Object} config - The pagination configuration
          * @param {number} page - The page number to retrieve
          */
+        
         await getRolesToTable({
             filters: state.filter, 
             config: {
@@ -269,6 +270,7 @@
             },
             page
         });
+        //console.log(rolesToTable);
     };
 
     const getPermissions = () => {

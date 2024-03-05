@@ -5,16 +5,24 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSubdomainRequest;
 use App\Http\Requests\UpdateSubdomainRequest;
+use App\Http\Resources\SubdomainResource;
 use App\Interfaces\SubdomainRepositoryInterface;
 use App\Models\Subdomain;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
+use function redirect;
+use function response;
 
 class SubdomainController extends Controller
 {
     private $repository;
     
+    /**
+     * Constructs a new instance of the class.
+     *
+     * @param SubdomainRepositoryInterface $repository 
+     */
     public function __construct(SubdomainRepositoryInterface $repository) {
         $this->repository = $repository;
         
@@ -29,6 +37,12 @@ class SubdomainController extends Controller
         return Inertia::render('Subdomains/SubdomainsList');
     }
     
+    /**
+     * Get subdomains to table.
+     *
+     * @param Request $request 
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getSubdomainsToTable(Request $request) {
         //
         $config = $request->input('config', []);
@@ -63,18 +77,27 @@ class SubdomainController extends Controller
         return response()->json($data, Response::HTTP_OK);
     }
     
+    /**
+     * Returns all subdomains in the database.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getSubdomains() {
         $subdomains = Subdomain::all();
         
-        return response()->json($subdomains, Response::HTTP_OK);
+        $data = [
+          'subdomains' => $subdomains,
+        ];
+
+        return response()->json($data, Response::HTTP_OK);
     }
     
     /**
      * Get a subdomain by its ID.
      *
      * @param mixed $id The identifier of the subdomain to retrieve.
-     * @throws \Exception When there is a database or application error.
-     * @return \Illuminate\Http\JsonResponse Returns subdomain data if found, or an error message.
+     * @throws @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getSubdomainById($id) {
         try {
@@ -99,7 +122,8 @@ class SubdomainController extends Controller
     }
     
     public function getSubdomainsToSelect() {
-        return \App\Http\Resources\SubdomainResource::collection(Subdomain::all());
+        $aa = SubdomainResource::collection(Subdomain::all());
+        return $aa;
     }
     
     public function create(Request $request) {
