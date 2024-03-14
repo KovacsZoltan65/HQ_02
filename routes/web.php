@@ -195,4 +195,28 @@ Route::resource('/permissions', \App\Http\Controllers\Admin\PermissionController
     'restore' => 'permissions_restore',
 ]);
 
+
+// ===============================
+// COMPONENTS
+// ===============================
+Route::get('/getComponents', [App\Http\Controllers\ComponentController::class, 'getComponents'])->name('getComponents');
+Route::get('/getComponentsToTable', [App\Http\Controllers\ComponentController::class, 'getComponentsToTable'])->name('getComponentsToTable');
+Route::get('/getComponentById/{id}', [App\Http\Controllers\ComponentController::class, 'getComponentById'])->name('getComponentById');
+Route::get('/getComponentsToSelect', [App\Http\Controllers\ComponentController::class, 'getComponentsToSelect'])->name('getComponentsToSelect');
+Route::delete('/components/{component}/bulkDelete', [App\Http\Controllers\ComponentController::class, ''])->name('permissions_bulkDelete');
+Route::resource('/components', App\Http\Controllers\ComponentController::class)->names([
+    'index' => 'components',
+    'create' => 'components_create',
+    'store' => 'components_store',
+    'view' => 'components_view',
+    'edit' => 'components_edit',
+    'update' => 'components_update',
+    'destroy' => 'components_destroy',
+    'restore' => 'components_restore',
+]);
+
+
+
+
+
 require __DIR__.'/auth.php';

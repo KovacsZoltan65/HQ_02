@@ -159,12 +159,12 @@ php artisan make:factory PermissionFactory
 ======================
 = COMPONENTS
 ======================
-php artisan make:model Componnet
-php artisan make:controller ComponnetController --resource
-php artisan make:request CreateComponnetRequest
-php artisan make:request UpdateComponnetRequest
-php artisan make:repository Componnet
-php artisan make:criteria Componnet
+php artisan make:model Component
+php artisan make:controller ComponentController --resource
+php artisan make:request CreateComponentRequest
+php artisan make:request UpdateComponentRequest
+php artisan make:repository Component
+php artisan make:criteria Component
 //php artisan make:migration CreateComponnetTable
-php artisan make:seeder ComponnetSeeder
-php artisan make:factory ComponnetFactory
+php artisan make:seeder ComponentSeeder
+php artisan make:factory ComponentFactory
