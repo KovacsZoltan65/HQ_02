@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
+use App\Http\Resources\RoleResource;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -15,8 +16,7 @@ class RoleController extends Controller
 {
     private $repository;
     
-    public function __construct(RoleRepositoryInterface $repository)
-    {
+    public function __construct(RoleRepositoryInterface $repository) {
         $this->repository = $repository;
         
         //$this->middleware('can:role list', ['only' => ['index', 'show']]);
@@ -67,8 +67,9 @@ class RoleController extends Controller
         //$roles = Role::query()->paginate($per_page);
         $roles = $this->repository
             ->orderBy($column, $direction)
+            ->with('permissions')
             ->paginate( $config['per_page'] ?? config('app.per_page') );
-        
+        //dd($roles);
         // Készítse elő a visszaküldendő adatokat
         $data = [
             'data' => $roles,
@@ -93,7 +94,9 @@ class RoleController extends Controller
     }
     
     public function getRolesToSelect() {
-        return \App\Http\Resources\RoleResource::collection(Role::all());
+        return RoleResource::collection(
+            Role::orderBy('name', 'asc')->get()
+        );
     }
     
     public function create(Request $request) {

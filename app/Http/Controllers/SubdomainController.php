@@ -122,8 +122,9 @@ class SubdomainController extends Controller
     }
     
     public function getSubdomainsToSelect() {
-        $aa = SubdomainResource::collection(Subdomain::all());
-        return $aa;
+        return SubdomainResource::collection(
+            Subdomain::orderBy('name', 'asc')->get()
+        );
     }
     
     public function create(Request $request) {

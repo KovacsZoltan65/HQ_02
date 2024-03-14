@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePermissionRequest;
 use App\Http\Requests\UpdatePermissionRequest;
+use App\Http\Resources\PermissionResource;
 use App\Interfaces\PermissionRepositoryInterface;
 use App\Models\Permission;
 use Illuminate\Http\Request;
@@ -104,7 +105,9 @@ class PermissionController extends Controller
     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     */
     public function getPermissionsToSelect() {
-        return \App\Http\Resources\PermissionResource::collection(Permission::all());
+        return PermissionResource::collection(
+            Permission::orderBy('name', 'asc')->get()
+        );
     }
 
 

@@ -10,6 +10,9 @@
     import Swal from 'sweetalert2';
     import 'sweetalert2/dist/sweetalert2.min.css';
 
+    //import 'bootstrap-tagsinput/dist/bootstrap-tagsinput.css';
+    //import 'bootstrap-tagsinput/dist/bootstrap-tagsinput.js';
+
     const local_storage_column_key = 'ln_roles_grid_columns';
 
     const props = defineProps({
@@ -26,6 +29,7 @@
     // ===================================
     // Services
     // ===================================
+    // Roles
     import useRoles from '@/services/roles.js';
     const {
         roles, rolesToSelect, rolesToTable, role, 
@@ -34,6 +38,7 @@
         roleDelete, roleBulkDelete, roleRestore
 
     } = useRoles();
+    // Permissions
     import usePermissions from '@/services/permissions.js';
     const {getPermissionsToSelect, permissionsToSelect} = usePermissions();
 
@@ -56,7 +61,7 @@
     const state = reactive({
         Records: [],
         Record: newRecord(),
-        Subdomains: [],
+        //Permissions: [],
 
         editingRecord: newRecord(),
         deletingRecord: newRecord(),
@@ -250,18 +255,11 @@
         }
     };
     
-    
     /**
      * Retrieve records from the server
      * @param {number} page - The page number to retrieve
      */
     const getRecords = async (page = state.pagination.current_page) => {
-        /**
-         * Retrieve roles with specified filters and pagination configuration
-         * @param {Object} filters - The filters to apply
-         * @param {Object} config - The pagination configuration
-         * @param {number} page - The page number to retrieve
-         */
         
         await getRolesToTable({
             filters: state.filter, 
@@ -275,7 +273,6 @@
 
     const getPermissions = () => {
         getPermissionsToSelect();
-        state.Subdomains = permissionsToSelect;
     };
 
     onMounted(() => {
@@ -290,6 +287,7 @@
         getPermissions();
 
         getRecords();
+
     });
 
     const settings_init = () => { openSettingsModal(); };
@@ -343,10 +341,27 @@
 
     };
 
+    const check_p = (permissions, id) => {
+
+        let result = false;
+        if( permissions !== undefined ) {
+            permissions.map(function(value, key) {
+                //console.log('value.id',value.id);
+                if( value.id === id ) {
+                    result = true;
+                }
+            });
+        }
+
+        return result;
+    };
+
 </script>
 
 <template>
-    <Head :title="$t('roles')"/>
+    
+    <Head :title="$t('roles')" />
+
     <MainLayout>
         
         <!-- CONTENT HEADER -->
@@ -534,9 +549,11 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div>
+
+                        <div class="row">
+                        
                             <!-- NAME -->
-                            <div class="form-group">
+                            <div class="col form-group">
                                 <label>{{ $t('name') }}</label>
                                 
                                 <input name="name" type="text" 
@@ -551,7 +568,7 @@
                             </div>
 
                             <!-- GUARD_NAME -->
-                            <div class="form-group">
+                            <div class="col form-group">
                                 <label>{{ $t('guard_name') }}</label>
                                 
                                 <input name="guard_name" type="text" 
@@ -562,6 +579,24 @@
                                     v-model="state.editingRecord.guard_name"/>
                                 <div class="invalid-feedback" 
                                     v-if="errors?.guard_name">{{ errors.guard_name[0] }}</div>
+
+                            </div>
+                        
+                        </div>
+                        <div class="row">
+                            <div class="col form-group">
+
+                                <div v-for="(permission, index) in permissionsToSelect" 
+                                        :key="permission.id" 
+                                        class="form-check">
+                                    <input class="form-check-input" 
+                                            type="checkbox" 
+                                            v-model="permission.id"
+                                            :checked="check_p(state.editingRecord.permissions, permission.id)" 
+                                    />
+                                    <label class="form-check-label"
+                                    >{{ permission.text }}</label>
+                                </div>
 
                             </div>
                         </div>
