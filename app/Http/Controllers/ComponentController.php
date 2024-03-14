@@ -26,15 +26,51 @@ class ComponentController extends Controller
 
     public function getComponentsToTable(Request $request){}
     
-    public function getComponents(){}
+    public function getComponentsToSelect() {
+        return \App\Http\Resources\ComponentResource::collection(
+            Component::orderBy('name', 'asc')->get()
+        );
+    }
     
-    public function getComponentById($id){}
+    public function getComponents() {
+        $components = \App\Models\Component::all();
+        
+        $data = [
+            'components' => $components,
+        ];
+        
+        return response()->json($data, Response::HTTP_OK);
+    }
+    
+    public function getComponentById($id) {
+        try {
+            $component = $this->repository->find($id);
+            
+            if( !$component ) {
+                return response()->json([
+                    'message' => __('subdomain_not_found')
+                ], Response::HTTP_NOT_FOUND);
+            }
+            
+            return response()->json($component, Response::HTTP_OK);
+        } catch( \Exception $e ) {
+            return response()->json([
+                'message' => __('unexpected_error'),
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
     
     /**
      * Show the form for creating a new resource.
      */
-    public function create() {
-        //
+    public function create(Request $request) {
+        $component = new \App\Models\Component();
+        
+        return \Inertia\Inertia::render('Components/ComponentsCreate', [
+            'can' => $this->_getRoles(),
+            'component' => $component,
+        ]);
     }
 
     /**

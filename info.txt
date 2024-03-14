@@ -47,7 +47,7 @@ password
 
 php artisan make:model Role
 php artisan make:controller Admin\RoleController --resource
-php artisan make:request CreateRoleRequest
+php artisan make:request StoreRoleRequest
 php artisan make:request UpdateRoleRequest
 php artisan make:repository Role
 php artisan make:criteria Role
@@ -135,7 +135,7 @@ php artisan make:factory SubdomainFactory
 ======================
 php artisan make:model Role
 php artisan make:controller Admin\RoleController --resource
-php artisan make:request CreateRoleRequest
+php artisan make:request StoreRoleRequest
 php artisan make:request UpdateRoleRequest
 php artisan make:repository Role
 php artisan make:criteria Role
@@ -148,23 +148,25 @@ php artisan make:factory RoleFactory
 ======================
 php artisan make:model Permission
 php artisan make:controller PermissionController --resource
-php artisan make:request CreatePermissionRequest
+php artisan make:request StorePermissionRequest
 php artisan make:request UpdatePermissionRequest
 php artisan make:repository Permission
 php artisan make:criteria Permission
 php artisan make:migration CreatePermissionTable
 php artisan make:seeder PermissionSeeder
 php artisan make:factory PermissionFactory
+php artisan make:resource PermissionResource
 
 ======================
 = COMPONENTS
 ======================
 php artisan make:model Component
 php artisan make:controller ComponentController --resource
-php artisan make:request CreateComponentRequest
+php artisan make:request StoreComponentRequest
 php artisan make:request UpdateComponentRequest
 php artisan make:repository Component
 php artisan make:criteria Component
 //php artisan make:migration CreateComponnetTable
 php artisan make:seeder ComponentSeeder
 php artisan make:factory ComponentFactory
+php artisan make:resource ComponentResource
