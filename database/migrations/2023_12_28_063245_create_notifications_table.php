@@ -12,12 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('type');
+            //$table->uuid('id')->primary();
+            $table->increments('id')->comment('rekord azonosító');
+            $table->string('type')->comment('Üzenet típusa');
             $table->morphs('notifiable');
-            $table->text('data');
-            $table->timestamp('read_at')->nullable();
+            $table->text('data')->comment('Üzenet szövege');
+            $table->timestamp('read_at')->nullable()->comment('Elolvasva ekkor');
+            
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

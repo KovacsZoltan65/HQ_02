@@ -34,7 +34,9 @@ class SubdomainController extends Controller
     }
     
     public function index(Request $request) {
-        return Inertia::render('Subdomains/SubdomainsList');
+        return Inertia::render('Subdomains/SubdomainsList', [
+            'can' => $this->_getRoles(),
+        ]);
     }
     
     /**
@@ -51,22 +53,33 @@ class SubdomainController extends Controller
         //
         $page = $request->input('page', 1);
         
-        if( isset($filters['search']) ) {
-            $value = $filters['search'];
-            $this->repository->findWhere([
-                ['name','like', "%$value%"],
-                ['url', 'like', "%$value%"],
-                ['db_name', 'like', "%$value%"],
-                ['db_user', 'like', "%$value%"],
-            ]);
+        if( count($filters) > 0 ){
+            
+            // --------------------
+            // SZŰRÉS
+            // --------------------
+            if( isset($filters['search']) ) {
+                $value = $filters['search'];
+                $this->repository->findWhere([
+                    ['name','like', "%$value%"],
+                    ['url', 'like', "%$value%"],
+                    ['db_name', 'like', "%$value%"],
+                    ['db_user', 'like', "%$value%"],
+                ]);
+            }
+            
+            // --------------------
+            // RENDEZÉS
+            // --------------------
+            $column = $filters['column'] ?? 'type';
+            $direction = $filters['direction'] ?? 'asc';
+            
+            $this->repository->orderBy($column, $direction);
         }
         
-        $column = $filters['column'] ?? 'name';
-        $direction = $filters['direction'] ?? 'asc';
+        $per_page = $config['per_page'] ?? config('app.per_page');
         
-        $subdomains = $this->repository
-                ->orderBy($column, $direction)
-                ->paginate( $config['per_page'] ?? config('app.per_page') );
+        $subdomains = $this->repository->paginate($per_page);
         
         $data = [
             'data' => $subdomains,
@@ -123,7 +136,7 @@ class SubdomainController extends Controller
     
     public function getSubdomainsToSelect() {
         return SubdomainResource::collection(
-            Subdomain::orderBy('name', 'asc')->get()
+                        Subdomain::orderBy('name', 'asc')->get()
         );
     }
     
@@ -206,7 +219,7 @@ class SubdomainController extends Controller
     /**
      * Delete multiple subdomains in bulk based on provided IDs.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function bulkDelete(Request $request) {

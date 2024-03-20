@@ -17,6 +17,8 @@ return new class extends Migration
             $table->increments('id')->comment('Rekord azonosító');
             $table->string('key')->default('')->comment('Kulcs');
             $table->string('value')->default('')->comment('Érték');
+            
+            $table->timestamps();
         });
     }
 

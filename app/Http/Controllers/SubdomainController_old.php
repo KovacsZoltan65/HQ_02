@@ -29,7 +29,9 @@ class SubdomainController_old extends Controller
      */
     public function index(Request $request)
     {
-        return Inertia::render('Subdomains/SubdomainsList');
+        return Inertia::render('Subdomains/SubdomainsList', [
+            'can' => $this->_getRoles(),
+        ]);
     }
 
     /**

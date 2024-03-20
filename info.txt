@@ -170,3 +170,19 @@ php artisan make:criteria Component
 php artisan make:seeder ComponentSeeder
 php artisan make:factory ComponentFactory
 php artisan make:resource ComponentResource
+
+======================
+= NOTIFICATIONS
+======================
+php artisan make:model Notification
+php artisan make:repository Notification
+php artisan make:criteria Notification
+php artisan make:controller NotificationController --resource
+
+php artisan make:request StoreNotificationRequest
+php artisan make:request UpdateNotificationRequest
+
+//php artisan make:migration CreateComponnetTable
+php artisan make:seeder NotificationSeeder
+php artisan make:factory NotificationFactory
+php artisan make:resource NotificationResource
