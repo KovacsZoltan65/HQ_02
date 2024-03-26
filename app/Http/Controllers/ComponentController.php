@@ -29,6 +29,7 @@ class ComponentController extends Controller
         //$this->middleware('can:component delete', ['only' => ['destroy']]);
         //$this->middleware('can:component restore', ['only' => ['restore']]);
     }
+    
     /**
      * Display a listing of the resource.
      *
@@ -43,17 +44,40 @@ class ComponentController extends Controller
         ]);
     }
 
+    /**
+     * Az összetevők listáját adja vissza az adott szűrő és lapozási beállítások szerint.
+     * 
+     * @param Request $request The request instance
+     * 
+     * @return \Illuminate\Http\JsonResponse The JSON response
+     */
     public function getComponentsToTable(Request $request) {
+        /**
+         * A konfigurációs paraméterek
+         * @var array
+         */
         $config = $request->input('config', []);
+        
+        /**
+         * A szűrő paraméterei
+         * @var array
+         */
         $filters = $request->input('filters', []);
+        
+        /**
+         * Az aktuális oldalszám
+         * @var int
+         */
         $page = $request->input('page', 1);
-
+        
         if( count($filters) > 0 ) {
-            // ------------------
-            // SZŰRÉS
-            // ------------------
-            if( isset($filters['search']) ) {
-                $value = $filters['search'];
+            /**
+             * A keresési érték
+             * @var string|null
+             */
+            $value = $filters['search'] ?? null;
+            
+            if( isset($value) ) {
                 $this->repository->findWhere([
                     ['name', 'LIKE', "%$value%"]
                 ]);
@@ -62,14 +86,31 @@ class ComponentController extends Controller
             // ------------------
             // RENDEZÉS
             // ------------------
+            /**
+             * The column to order by
+             * @var string
+             */
             $column = $filters['column'] ?? 'type';
+            
+            /**
+             * A rendezés iránya
+             * @var string
+             */
             $direction = $filters['direction'] ?? 'asc';
+            
             $this->repository->orderBy($column, $direction);
         }
         
-        $components = $this->repository
-                ->paginate( $config['per_page'] ?? $config('app.per_page') );
+        /**
+         * Az összetevők listája
+         * @var \Illuminate\Pagination\LengthAwarePaginator
+         */
+        $components = $this->repository->paginate( $config['per_page'] ?? $config('app.per_page') );
         
+        /**
+         * A válaszadatok
+         * @var array
+         */
         $data = [
             'data' => $components,
             'config' => $config,
@@ -78,30 +119,34 @@ class ComponentController extends Controller
         
         return response()->json($data, Response::HTTP_OK);
     }
-    
-    public function getComponentsToSelect() {
-        return ComponentResource::collection(
-            Component::orderBy('name', 'asc')->get()
+
+    public function getComponents() {
+        ComponentResource::collection(
+                Component::latest()->get()
         );
     }
     
-    public function getComponents() {
-        $components = Component::all();
-        
-        $data = [
-            'components' => $components,
-        ];
-        
-        return response()->json($data, Response::HTTP_OK);
+    public function getComponentsToSelect() {
+        return ComponentResource::collection(
+            Component::select('id', 'name')->orderBy('name', 'asc')->get()
+        );
     }
     
+    /**
+     * Returns a component by its ID
+     * 
+     * @param int $id The component ID
+     * 
+     * @return JsonResponse
+     */
     public function getComponentById($id) {
         try {
+            /** @var Component $component */
             $component = $this->repository->find($id);
             
             if( !$component ) {
                 return response()->json([
-                    'message' => __('subdomain_not_found')
+                    'message' => __('subdomain_not_found'),
                 ], Response::HTTP_NOT_FOUND);
             }
             
@@ -113,16 +158,21 @@ class ComponentController extends Controller
             ]);
         }
     }
+
     
     /**
-     * Show the form for creating a new resource.
+     * Shows the component creation page
+     *
+     * @param Request $request The request instance
+     *
+     * @return \Inertia\Response The Inertia response
      */
     public function create(Request $request) {
         $component = new Component();
         
         return Inertia::render('Components/ComponentsCreate', [
-            'can' => $this->_getRoles(),
-            'component' => $component,
+            'can' => $this->_getRoles(), // The user's roles
+            'data' => $component,       // The component data
         ]);
     }
 
@@ -138,31 +188,36 @@ class ComponentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id) {
-        //
-    }
+    public function show(string $id) {}
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Component $component) {
-        //
-    }
+    public function edit(Component $component) {}
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param UpdateComponentRequest $request The update request
+     * @param int $id The component ID
+     *
+     * @return JsonResponse The JSON response
+     *
+     * @throws \Exception
      */
-    public function update(UpdateComponentRequest $request, string $id) {
+    public function update(UpdateComponentRequest $request, $id) {
         try {
             $component = $this->repository->update($request->all(), $id);
             
             if( !$component ){
-                return response()->json(['message' => __('components_not_updated')], Response::HTTP_NOT_FOUND);
+                return response()->json([
+                    'message' => __('components_not_updated'),
+                ], Response::HTTP_NOT_FOUND);
             }
             
             return response()->json([
                 'message' => __('components_updated'),
-                'subdomain' => $component
+                'subdomain' => $component,
             ], Response::HTTP_OK);
             
         } catch(\Exception $exception) {
@@ -174,21 +229,27 @@ class ComponentController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Soft-delete the specified resource from storage.
+     *
+     * @param Component $component The component to delete
+     *
+     * @return JsonResponse The JSON response
+     *
+     * @throws \Exception If the component could not be deleted
      */
     public function destroy(Component $component) {
-        try{
+        try {
             $this->repository->delete($component->id);
             
             return response()->json([
                 'success' => true,
-                'message' => __('components_deleted')
+                'message' => __('components_deleted'),
             ], Response::HTTP_OK);
-        }catch( \Exception $exception ){
+        } catch (\Exception $exception) {
             return response()->json([
                 'success' => false,
                 'message' => __('unexpected_error'),
-                'error' => $exception->getMessage()
+                'error' => $exception->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

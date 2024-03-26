@@ -125,10 +125,25 @@ php artisan make:controller SubdomainController --resource
 php artisan make:request CreateSubdomainRequest
 php artisan make:request UpdateSubdomainRequest
 php artisan make:repository Subdomain
-php artisan make:criteria SubdomainCriteria
+php artisan make:criteria Subdomain
 php artisan make:migration CreateSubdomainTable
 php artisan make:seeder SubdomainSeeder
 php artisan make:factory SubdomainFactory
+php artisan make:resource SubdomainResource
+
+======================
+= SUBDOMAIN_STATES
+======================
+php artisan make:model SubdomainState
+php artisan make:controller SubdomainStateController --resource
+php artisan make:request StoreSubdomainStateRequest
+php artisan make:request UpdateSubdomainStateRequest
+php artisan make:repository SubdomainState
+php artisan make:criteria SubdomainState
+php artisan make:migration CreateSubdomainStateTable
+php artisan make:seeder SubdomainStateSeeder
+php artisan make:factory SubdomainStateFactory
+php artisan make:resource SubdomainStateResource
 
 ======================
 = ROLES
@@ -142,6 +157,7 @@ php artisan make:criteria Role
 php artisan make:migration CreateRoleTable
 php artisan make:seeder RoleSeeder
 php artisan make:factory RoleFactory
+php artisan make:resource RoleResource
 
 ======================
 = PERMISSIONS
@@ -186,3 +202,19 @@ php artisan make:request UpdateNotificationRequest
 php artisan make:seeder NotificationSeeder
 php artisan make:factory NotificationFactory
 php artisan make:resource NotificationResource
+
+======================
+= HQ SETTINGS
+======================
+php artisan make:model HqSetting
+php artisan make:repository HqSetting
+php artisan make:criteria HqSetting
+php artisan make:controller HqSettingController --resource
+
+php artisan make:request StoreHqSettingRequest
+php artisan make:request UpdateHqSettingRequest
+
+//php artisan make:migration CreateHqSettingTable
+php artisan make:seeder HqSettingSeeder
+php artisan make:factory HqSettingFactory
+php artisan make:resource HqSettingResource

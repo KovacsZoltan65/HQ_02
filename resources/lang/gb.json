@@ -77,6 +77,22 @@
     
     "subdomains_restore": "The subdomain has been restored successfully!",
     
+    "subdomain_states": "Subdomain States",
+    "subdomain_state": "Subdomain State",
+    "subdomain_states_card_text": "List of subdomain states",
+    
+    "subdomain_states_new": "New Subdomain State",
+    "subdomain_states_created": "The subdomain state has been created successfully",
+    
+    "subdomain_states_edit": "Edit Subdomain State",
+    "subdomain_states_updated": "The subdomain state has been successfully updated!",
+    
+    "subdomain_states_delete": "Delete Subdomain State",
+    "subdomain_states_delete_confirmation": "Are you sure you want to delete this subdomain state ?",
+    "subdomain_states_deleted": "The subdomain state has been successfully deleted!",
+    "subdomain_states_bulk_deleted": "The group deletion of the subdomain state has been successfully completed!",
+    "subdomain_states_restore": "The subdomain state has been restored successfully!",
+    
     "roles": "Roles",
     "role": "Role",
     

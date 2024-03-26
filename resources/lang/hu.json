@@ -77,6 +77,22 @@
     
     "subdomains_restore": "Az aldomain visszaállítása sikeresen megtörtént!",
     
+    "subdomain_states": "Aldomain állapotok",
+    "subdomain_state": "Aldomain állapot",
+    "subdomain_states_card_text": "Aldomain állapotok listája",
+    
+    "subdomain_states_new": "Új aldomain állapot",
+    "subdomain_states_created": "Az aldomain állapot elkészült",
+    
+    "subdomain_states_edit": "Aldomain állapot szerkesztése",
+    "subdomain_states_updated": "Az aldomain állapot sikeresen frissítve",
+    
+    "subdomain_states_delete": "Aldomain állapot törlése",
+    "subdomain_states_delete_confirmation": "Biztosan törli a(z) :name aldomain állapotot?",
+    "subdomain_states_deleted": "Az aldomain állapot törlése sikeresen megtörtént!",
+    "subdomain_states_bulk_deleted": "Az aldomain állapot csoportos törlése sikeresen megtörtént!",
+    "subdomain_states_restore": "Az aldomain állapot visszaállítása sikeresen megtörtént!",
+    
     "roles": "Szerepkörök",
     "role": "Szerepkör",
     

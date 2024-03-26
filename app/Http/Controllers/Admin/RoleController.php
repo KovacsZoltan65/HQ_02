@@ -38,65 +38,57 @@ class RoleController extends Controller
     }
     
     public function getRolesToTable(Request $request) {
-        // Szerezze be a konfigurációt és a szűrőket a kérésből
         $config = $request->input('config', []);
         $filters = $request->input('filters', []);
-        // Oldal
         $page = $request->input('page', 1);
-        
-        // Engedélyek keresése, ha van keresési szűrő
-        if( isset($filters['search']) )
-        {
-            $value = $filters['search'];
-            $this->repository->findWhere([
-                ['name','like', "%$value%"],
-                ['guard_name', 'like', "%$value%"],
-            ]);
+
+        if( count($filters) > 0 ) {
+            // ------------------
+            // SZŰRÉS
+            // ------------------
+            if( isset($filters['search']) ) {
+                $value = $filters['search'];
+                $this->repository->findWhere([
+                    ['name', 'LIKE', "%$value%"]
+                ]);
+            }
+            
+            // ------------------
+            // RENDEZÉS
+            // ------------------
+            $column = $filters['column'] ?? 'type';
+            $direction = $filters['direction'] ?? 'asc';
+            $this->repository->orderBy($column, $direction);
         }
         
-        // Állítsa be a rendelés oszlopát és irányát
-        $column = $filters['column'] ?? 'name';
-        $direction = $filters['direction'] ?? 'asc';
-        
-        // Rendelés alkalmazása a lekérdezésre
-        //$this->repository->orderBy($column, $direction);
-        
-        // Állítsa be az oldalankénti engedélyek számát
-        //$per_page = $config['per_page'] ?? config('app.per_page');
-        // Szerezze be az engedélyeket oldalszámozással
-        //$roles = Role::query()->paginate($per_page);
         $roles = $this->repository
-            ->orderBy($column, $direction)
-            ->with('permissions')
-            ->paginate( $config['per_page'] ?? config('app.per_page') );
-        //dd($roles);
-        // Készítse elő a visszaküldendő adatokat
+                ->paginate( $config['per_page'] ?? $config('app.per_page') );
+        
         $data = [
             'data' => $roles,
             'config' => $config,
             'filters' => $filters,
         ];
         
-        // Adja vissza az adatokat JSON-válaszként
         return response()->json($data, Response::HTTP_OK);
     }
     
     public function getRoles() {
-        $roles = Role::all();
-
-        return response()->json($roles, Response::HTTP_OK);
+        RoleResource::collection(
+            Role::latest()->get()
+        );
+    }
+    
+    public function getRolesToSelect() {
+        return RoleResource::collection(
+            Role::select('id', 'name')->orderBy('name', 'asc')->get()
+        );
     }
     
     public function getRoleById($id) {
         $role = Role::find($id);
 
         return response()->json($role, Response::HTTP_OK);
-    }
-    
-    public function getRolesToSelect() {
-        return RoleResource::collection(
-            Role::orderBy('name', 'asc')->get()
-        );
     }
     
     public function create(Request $request) {

@@ -12,6 +12,7 @@ class Subdomain extends Model
         SoftDeletes;
 
     protected $table = 'subdomains';
+    
     protected $casts = [
                       'db_port' => 'int',
                  'notification' => 'bool',
@@ -33,9 +34,9 @@ class Subdomain extends Model
     ];
 
     protected $fillable = [
-		'subdomain', 'url', 'name',
-		'db_host', 'db_port', 'db_name', 'db_user', 'db_password',
-		'notification', 'state_id', 'is_mirror', 'sso',
-		'access_control_system', 'last_export'
-	];
+        'subdomain', 'url', 'name',
+        'db_host', 'db_port', 'db_name', 'db_user', 'db_password',
+        'notification', 'state_id', 'is_mirror', 'sso',
+        'access_control_system', 'last_export'
+    ];
 }

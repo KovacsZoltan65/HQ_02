@@ -40,46 +40,52 @@ class SubdomainController extends Controller
     }
     
     /**
-     * Get subdomains to table.
+     * Returns subdomains with pagination and filtering
      *
-     * @param Request $request 
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request The request object with pagination and filtering configs
+     * @return \Illuminate\Http\JsonResponse The paginated subdomains
      */
     public function getSubdomainsToTable(Request $request) {
-        //
         $config = $request->input('config', []);
-        //
         $filters = $request->input('filters', []);
-        //
         $page = $request->input('page', 1);
         
-        if( count($filters) > 0 ){
-            
+        if( count($filters) > 0 ) {
             // --------------------
             // SZŰRÉS
             // --------------------
+            /**
+             * If the search query is present, add it to the query builder
+             * with OR conditions for name, url, db_name and db_user columns
+             */
             if( isset($filters['search']) ) {
-                $value = $filters['search'];
-                $this->repository->findWhere([
-                    ['name','like', "%$value%"],
-                    ['url', 'like', "%$value%"],
-                    ['db_name', 'like', "%$value%"],
-                    ['db_user', 'like', "%$value%"],
-                ]);
+                $value = $filters['search'].'%';
+                $this->repository->where('name','like', $value)
+                    ->orWhere('url','like', $value)
+                    ->orWhere('db_name','like', $value)
+                    ->orWhere('db_user','like', $value);
             }
             
             // --------------------
             // RENDEZÉS
             // --------------------
+            /**
+             * If the column and direction are specified, add an order by clause to the query builder
+             */
             $column = $filters['column'] ?? 'type';
+
+            /**
+             * If the sort direction is specified, add an order by direction to the query builder
+             * 
+             * @var string $direction The direction in which to order the data
+             */
             $direction = $filters['direction'] ?? 'asc';
+            # Set the default sort direction to ascending if not specified
             
             $this->repository->orderBy($column, $direction);
         }
         
-        $per_page = $config['per_page'] ?? config('app.per_page');
-        
-        $subdomains = $this->repository->paginate($per_page);
+        $subdomains = $this->repository->paginate( $config['per_page'] ?? config('app.per_page') );
         
         $data = [
             'data' => $subdomains,
@@ -96,13 +102,15 @@ class SubdomainController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function getSubdomains() {
-        $subdomains = Subdomain::all();
-        
-        $data = [
-          'subdomains' => $subdomains,
-        ];
-
-        return response()->json($data, Response::HTTP_OK);
+        return SubdomainResource::collection(
+            Subdomain::latest()->get()
+        );
+    }
+    
+    public function getSubdomainsToSelect() {
+        return SubdomainResource::collection(
+            Subdomain::select('id', 'name')->orderBy('name', 'asc')->get()
+        );
     }
     
     /**
@@ -132,12 +140,6 @@ class SubdomainController extends Controller
                 'error' => $exception->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-    
-    public function getSubdomainsToSelect() {
-        return SubdomainResource::collection(
-                        Subdomain::orderBy('name', 'asc')->get()
-        );
     }
     
     public function create(Request $request) {

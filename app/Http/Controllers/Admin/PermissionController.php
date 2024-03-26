@@ -44,72 +44,59 @@ class PermissionController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function getPermissionsToTable(Request $request) {
-        // Szerezze be a konfigurációt és a szűrőket a kérésből
         $config = $request->input('config', []);
         $filters = $request->input('filters', []);
-        // Oldal
         $page = $request->input('page', 1);
-        
-        // Engedélyek keresése, ha van keresési szűrő
-        if( isset($filters['search']) )
-        {
-            $value = $filters['search'];
-            $this->repository->findWhere([
-                ['name','like', "%$value%"],
-                ['guard_name', 'like', "%$value%"],
-            ]);
+
+        if( count($filters) > 0 ) {
+            // ------------------
+            // SZŰRÉS
+            // ------------------
+            if( isset($filters['search']) ) {
+                $value = $filters['search'];
+                $this->repository->findWhere([
+                    ['name', 'LIKE', "%$value%"]
+                ]);
+            }
+            
+            // ------------------
+            // RENDEZÉS
+            // ------------------
+            $column = $filters['column'] ?? 'type';
+            $direction = $filters['direction'] ?? 'asc';
+            $this->repository->orderBy($column, $direction);
         }
         
-        // Állítsa be a rendelés oszlopát és irányát
-        $column = $filters['column'] ?? 'name';
-        $direction = $filters['direction'] ?? 'asc';
-        
-        // Rendelés alkalmazása a lekérdezésre
-        //$this->repository->orderBy($column, $direction);
-        
-        // Állítsa be az oldalankénti engedélyek számát
-        //$per_page = $config['per_page'] ?? config('app.per_page');
-        // Szerezze be az engedélyeket oldalszámozással
-        //$permissions = Permission::query()->paginate($per_page);
         $permissions = $this->repository
-            ->orderBy($column, $direction)
-            ->paginate( $config['per_page'] ?? config('app.per_page') );
+                ->paginate( $config['per_page'] ?? $config('app.per_page') );
         
-        // Készítse elő a visszaküldendő adatokat
         $data = [
             'data' => $permissions,
             'config' => $config,
             'filters' => $filters,
         ];
         
-        // Adja vissza az adatokat JSON-válaszként
         return response()->json($data, Response::HTTP_OK);
     }
 
     public function getPermissions(){
-        $permissions = Permission::all();
-
-        return response()->json($permissions, Response::HTTP_OK);
+        return PermissionResource::collection(
+            Permission::latest()->get()
+        );
     }
 
+    public function getPermissionsToSelect() {
+        return PermissionResource::collection(
+            Permission::select('id', 'name')->orderBy('name', 'asc')->get()
+        );
+    }
+    
     public function getPermissionById($id) {
         //$permission = Permission::find($id);
 
         //return response()->json($permission, Response::HTTP_OK);
         return Permission::findOrFail($id);
     }
-
-    /**
-    * Retrieve permissions to select
-    *
-    * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    */
-    public function getPermissionsToSelect() {
-        return PermissionResource::collection(
-            Permission::orderBy('name', 'asc')->get()
-        );
-    }
-
 
     /**
      * Show the form for creating a new resource.

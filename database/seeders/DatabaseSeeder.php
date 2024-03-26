@@ -22,7 +22,10 @@ class DatabaseSeeder extends Seeder
             ModelHasPermissionTableSeeder::class,   // OK
             RoleHasPermissionsTableSeeder::class,   // OK
             
+            ComponentSeeder::class,
             HqSettingsTableSeeder::class,
+            SubdomainStatesSeeder::class,
+            NotificationSeeder::class,
         ]);
         // \App\Models\User::factory(10)->create();
 
