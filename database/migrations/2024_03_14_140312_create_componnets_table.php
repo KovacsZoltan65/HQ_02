@@ -11,7 +11,7 @@ return new class extends Migration {
      * @return void
      */
     public function up() {
-        Schema::create('componnets', function (Blueprint $table) {
+        Schema::create('components', function (Blueprint $table) {
             $table->increments('id')->comment('rekord azonosító');
             $table->string('name')->comment('Komponens neve');
 
@@ -26,6 +26,6 @@ return new class extends Migration {
      * @return void
      */
     public function down() {
-        Schema::dropIfExists('componnets');
+        Schema::dropIfExists('components');
     }
 };

@@ -12,7 +12,7 @@ class ComponentSeeder extends Seeder
      */
     public function run(): void
     {
-        \DB::table('componnets')->truncate();
+        \DB::table('components')->truncate();
 
         $arr_components = [
             ['id' => 1,'name' => 'Központi komponens',],
