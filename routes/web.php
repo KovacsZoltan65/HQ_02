@@ -195,7 +195,7 @@ Route::resource('/permissions', \App\Http\Controllers\Admin\PermissionController
     'restore' => 'permissions_restore',
 ]);
 
-
+/*
 // ===============================
 // COMPONENTS
 // ===============================
@@ -214,7 +214,7 @@ Route::resource('/components', App\Http\Controllers\ComponentController::class)-
     'destroy' => 'components_destroy',
     'restore' => 'components_restore',
 ]);
-
+*/
 
 
 
